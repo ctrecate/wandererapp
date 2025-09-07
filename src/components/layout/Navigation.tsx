@@ -11,7 +11,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useApp } from '@/context/AppContext'
-import { TabType } from '@/types'
+import type { TabType } from '@/types'
 
 const Navigation: React.FC = () => {
   const { activeTab, setActiveTab, currentTrip } = useApp()

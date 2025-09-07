@@ -3,7 +3,7 @@ import { MapPin, Clock, DollarSign, Star, CheckCircle, Circle } from 'lucide-rea
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { getAttractionsForCity } from '@/data/attractions'
-import { Attraction } from '@/types'
+import type { Attraction } from '@/types'
 import { cn } from '@/lib/utils'
 
 const Attractions: React.FC = () => {

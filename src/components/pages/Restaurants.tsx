@@ -3,7 +3,7 @@ import { Utensils, Star, MapPin, Phone, Clock, Heart, Filter } from 'lucide-reac
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { getRestaurantsForCity } from '@/data/restaurants'
-import { Restaurant } from '@/types'
+import type { Restaurant } from '@/types'
 import { cn } from '@/lib/utils'
 
 const Restaurants: React.FC = () => {

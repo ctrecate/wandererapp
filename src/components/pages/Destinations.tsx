@@ -3,7 +3,7 @@ import { Plus, Edit, Trash2, MapPin } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { DestinationForm } from '@/components/forms/DestinationForm'
 import { useApp } from '@/context/AppContext'
-import { Destination } from '@/types'
+import type { Destination } from '@/types'
 import { formatDateRange, getDaysBetween } from '@/lib/utils'
 
 const Destinations: React.FC = () => {

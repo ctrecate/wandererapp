@@ -1,4 +1,4 @@
-import { Restaurant } from '@/types'
+import type { Restaurant } from '@/types'
 
 export const restaurantsData: Record<string, Restaurant[]> = {
   'paris': [

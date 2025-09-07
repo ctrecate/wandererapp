@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
 import { useApp } from '@/context/AppContext'
-import { Destination } from '@/types'
+import type { Destination } from '@/types'
 import { generateId } from '@/lib/utils'
 
 interface DestinationFormProps {

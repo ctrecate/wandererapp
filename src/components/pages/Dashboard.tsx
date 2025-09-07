@@ -2,7 +2,7 @@ import React from 'react'
 import { MapPin, Calendar, Cloud, Camera, Bus, Utensils } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import { formatDateRange, getDaysBetween } from '@/lib/utils'
-import { Destination } from '@/types'
+import type { Destination } from '@/types'
 
 const Dashboard: React.FC = () => {
   const { currentTrip } = useApp()

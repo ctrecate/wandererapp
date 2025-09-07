@@ -1,7 +1,7 @@
 'use client'
 
 import React, { createContext, useContext, useReducer, useEffect } from 'react'
-import { Trip, AppState, TabType } from '@/types'
+import type { Trip, AppState, TabType } from '@/types'
 
 interface AppContextType extends AppState {
   setCurrentTrip: (trip: Trip | null) => void

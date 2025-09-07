@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Cloud, Droplets, Wind, Thermometer } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import { fetchWeatherForecast } from '@/services/weather'
-import { Weather } from '@/types'
+import type { Weather } from '@/types'
 import { formatDate, formatTemperature, getWeatherIcon } from '@/lib/utils'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 

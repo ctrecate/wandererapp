@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { Shirt, Thermometer, Cloud, Sun, CloudRain, Snowflake } from 'lucide-react'
 import { useApp } from '@/context/AppContext'
 import { fetchWeatherForecast } from '@/services/weather'
-import { Weather, OutfitRecommendation } from '@/types'
-import { formatTemperature, getWeatherIcon } from '@/lib/utils'
+import type { Weather, OutfitRecommendation } from '@/types'
+import { formatTemperature, getDestinationType } from '@/lib/utils'
 
 const Outfits: React.FC = () => {
   const { currentTrip } = useApp()
@@ -74,7 +74,7 @@ const Outfits: React.FC = () => {
   }
 
   const generateOutfitForConditions = (tempRange: string, condition: string, avgTemp: number, city: string): OutfitRecommendation | null => {
-    const destinationType = getDestinationType(city)
+    const destinationType = getDestinationType(city, '')
     
     const baseOutfit = {
       id: `${tempRange}-${condition}-${city}`,
@@ -164,18 +164,8 @@ const Outfits: React.FC = () => {
     return baseOutfit
   }
 
-  const getDestinationType = (city: string): string => {
-    const beachCities = ['miami', 'san diego', 'barcelona', 'sydney', 'cancun', 'phuket']
-    const mountainCities = ['denver', 'zurich', 'vancouver', 'salt lake city', 'aspen']
-    
-    const lowerCity = city.toLowerCase()
-    
-    if (beachCities.some(beach => lowerCity.includes(beach))) return 'beach'
-    if (mountainCities.some(mountain => lowerCity.includes(mountain))) return 'mountain'
-    return 'city'
-  }
 
-  const getWeatherIcon = (condition: string) => {
+  const getWeatherIconComponent = (condition: string) => {
     if (condition.includes('rain')) return <CloudRain className="h-5 w-5 text-blue-500" />
     if (condition.includes('snow')) return <Snowflake className="h-5 w-5 text-blue-300" />
     if (condition.includes('cloud')) return <Cloud className="h-5 w-5 text-gray-500" />
@@ -236,7 +226,7 @@ const Outfits: React.FC = () => {
                   {outfits.map((outfit, index) => (
                     <div key={index} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-center space-x-3 mb-4">
-                        {getWeatherIcon(outfit.weatherCondition)}
+                        {getWeatherIconComponent(outfit.weatherCondition)}
                         <div>
                           <h3 className="font-medium text-gray-900 capitalize">
                             {outfit.weatherCondition} Weather

@@ -1,4 +1,4 @@
-import { Weather } from '@/types'
+import type { Weather } from '@/types'
 
 const OPENWEATHER_API_KEY = process.env.NEXT_PUBLIC_OPENWEATHER_API_KEY || 'demo-key'
 
