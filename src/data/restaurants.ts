@@ -37,6 +37,30 @@ export const restaurantsData: Record<string, Restaurant[]> = {
       phone: '+33 1 42 72 13 77',
       openingHours: '11:30 AM - 11:00 PM',
       isBookmarked: false
+    },
+    {
+      id: 'le-bistrot-paul-bert',
+      name: 'Le Bistrot Paul Bert',
+      cuisine: 'Traditional French',
+      priceRange: 3,
+      rating: 4.4,
+      mustTryDishes: ['Steak frites', 'Tarte tatin', 'Wine selection'],
+      address: '18 Rue Paul Bert, 75011 Paris',
+      phone: '+33 1 43 72 24 01',
+      openingHours: '12:00 PM - 2:00 PM, 7:30 PM - 11:00 PM (closed weekends)',
+      isBookmarked: false
+    },
+    {
+      id: 'l-as-du-fallafel',
+      name: 'L\'As du Fallafel',
+      cuisine: 'Middle Eastern',
+      priceRange: 1,
+      rating: 4.2,
+      mustTryDishes: ['Falafel sandwich', 'Hummus', 'Sabich'],
+      address: '34 Rue des Rosiers, 75004 Paris',
+      phone: '+33 1 48 87 63 60',
+      openingHours: '11:00 AM - 11:30 PM (closed Saturdays)',
+      isBookmarked: false
     }
   ],
   'london': [
@@ -62,6 +86,42 @@ export const restaurantsData: Record<string, Restaurant[]> = {
       address: '160 Piccadilly, St. James\'s, London W1J 9EB',
       phone: '+44 20 7499 6996',
       openingHours: '7:00 AM - 12:00 AM',
+      isBookmarked: false
+    },
+    {
+      id: 'borough-market',
+      name: 'Borough Market',
+      cuisine: 'Food Market',
+      priceRange: 2,
+      rating: 4.5,
+      mustTryDishes: ['Artisan cheeses', 'Fresh oysters', 'Gourmet sandwiches'],
+      address: '8 Southwark St, London SE1 1TL',
+      phone: '+44 20 7407 1002',
+      openingHours: '10:00 AM - 5:00 PM (Thu-Sat)',
+      isBookmarked: false
+    },
+    {
+      id: 'rules-restaurant',
+      name: 'Rules Restaurant',
+      cuisine: 'Traditional British',
+      priceRange: 4,
+      rating: 4.3,
+      mustTryDishes: ['Roast beef', 'Game pie', 'Sticky toffee pudding'],
+      address: '35 Maiden Ln, London WC2E 7LB',
+      phone: '+44 20 7836 5314',
+      openingHours: '12:00 PM - 11:30 PM',
+      isBookmarked: false
+    },
+    {
+      id: 'padella',
+      name: 'Padella',
+      cuisine: 'Italian',
+      priceRange: 2,
+      rating: 4.7,
+      mustTryDishes: ['Pici cacio e pepe', 'Pappardelle with beef shin', 'Tiramisu'],
+      address: '6 Southwark St, London SE1 1TQ',
+      phone: '+44 20 7403 2151',
+      openingHours: '12:00 PM - 10:00 PM',
       isBookmarked: false
     }
   ],

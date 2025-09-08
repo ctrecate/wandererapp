@@ -7,9 +7,10 @@ Create a `.env.local` file in the root directory with the following variables:
 # Get your free API key at: https://openweathermap.org/api
 NEXT_PUBLIC_OPENWEATHER_API_KEY=your_openweather_api_key_here
 
-# Google Places API Key (Optional - for enhanced location data)
+# Google Places API Key (HIGHLY RECOMMENDED - for real restaurant and attraction data)
 # Get your API key at: https://console.cloud.google.com/
-NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=your_google_places_api_key_here
+# Enable Places API and Text Search API
+NEXT_PUBLIC_GOOGLE_PLACES_API_KEY=AIzaSyA_s8qPRrFrKfAvAU_N-CmIumtmDTHUmik
 
 # Unsplash API Key (Optional - for destination images)
 # Get your access key at: https://unsplash.com/developers
@@ -24,13 +25,17 @@ NEXT_PUBLIC_UNSPLASH_ACCESS_KEY=your_unsplash_access_key_here
 - Copy your API key
 - Add it to `.env.local` as `NEXT_PUBLIC_OPENWEATHER_API_KEY`
 
-### 2. Google Places API (Optional)
+### 2. Google Places API (HIGHLY RECOMMENDED)
 - Go to [Google Cloud Console](https://console.cloud.google.com/)
 - Create a new project or select existing one
-- Enable Places API
+- Enable these APIs:
+  - Places API
+  - Places API (New)
+  - Text Search API
 - Create credentials (API Key)
 - Copy your API key
 - Add it to `.env.local` as `NEXT_PUBLIC_GOOGLE_PLACES_API_KEY`
+- **Note**: This enables real restaurant and attraction data for ANY city worldwide
 
 ### 3. Unsplash API (Optional)
 - Sign up at [Unsplash Developers](https://unsplash.com/developers)

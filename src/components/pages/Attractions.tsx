@@ -3,6 +3,7 @@ import { MapPin, Clock, DollarSign, Star, CheckCircle, Circle } from 'lucide-rea
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { getAttractionsForCity } from '@/data/attractions'
+import { fetchAttractionsFromAPI } from '@/services/places'
 import type { Attraction } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -17,21 +18,40 @@ const Attractions: React.FC = () => {
     }
   }, [currentTrip?.destinations])
 
-  const loadAttractionsForDestinations = () => {
+  const loadAttractionsForDestinations = async () => {
     if (!currentTrip) return
 
     const newAttractions: Record<string, Attraction[]> = {}
     
-    currentTrip.destinations.forEach(destination => {
-      const cityAttractions = getAttractionsForCity(destination.city)
-      // Merge with existing attractions from the destination
-      const existingAttractions = destination.attractions || []
-      const mergedAttractions = cityAttractions.map(attraction => {
-        const existing = existingAttractions.find(existing => existing.id === attraction.id)
-        return existing ? { ...attraction, ...existing } : attraction
-      })
-      newAttractions[destination.id] = mergedAttractions
-    })
+    for (const destination of currentTrip.destinations) {
+      try {
+        // Try to get attractions from API first, fallback to static data
+        let cityAttractions = await fetchAttractionsFromAPI(destination.city, destination.country)
+        
+        // If API returns empty, try static data
+        if (cityAttractions.length === 0) {
+          cityAttractions = getAttractionsForCity(destination.city)
+        }
+        
+        // Merge with existing attractions from the destination
+        const existingAttractions = destination.attractions || []
+        const mergedAttractions = cityAttractions.map(attraction => {
+          const existing = existingAttractions.find(existing => existing.id === attraction.id)
+          return existing ? { ...attraction, ...existing } : attraction
+        })
+        newAttractions[destination.id] = mergedAttractions
+      } catch (error) {
+        console.error('Error loading attractions for', destination.city, error)
+        // Fallback to static data
+        const cityAttractions = getAttractionsForCity(destination.city)
+        const existingAttractions = destination.attractions || []
+        const mergedAttractions = cityAttractions.map(attraction => {
+          const existing = existingAttractions.find(existing => existing.id === attraction.id)
+          return existing ? { ...attraction, ...existing } : attraction
+        })
+        newAttractions[destination.id] = mergedAttractions
+      }
+    }
 
     setAttractions(newAttractions)
   }

@@ -3,6 +3,7 @@ import { Utensils, Star, MapPin, Phone, Clock, Heart, Filter } from 'lucide-reac
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { getRestaurantsForCity } from '@/data/restaurants'
+import { fetchRestaurantsFromAPI } from '@/services/places'
 import type { Restaurant } from '@/types'
 import { cn } from '@/lib/utils'
 
@@ -22,21 +23,40 @@ const Restaurants: React.FC = () => {
     }
   }, [currentTrip?.destinations])
 
-  const loadRestaurantsForDestinations = () => {
+  const loadRestaurantsForDestinations = async () => {
     if (!currentTrip) return
 
     const newRestaurants: Record<string, Restaurant[]> = {}
     
-    currentTrip.destinations.forEach(destination => {
-      const cityRestaurants = getRestaurantsForCity(destination.city)
-      // Merge with existing restaurants from the destination
-      const existingRestaurants = destination.restaurants || []
-      const mergedRestaurants = cityRestaurants.map(restaurant => {
-        const existing = existingRestaurants.find(existing => existing.id === restaurant.id)
-        return existing ? { ...restaurant, ...existing } : restaurant
-      })
-      newRestaurants[destination.id] = mergedRestaurants
-    })
+    for (const destination of currentTrip.destinations) {
+      try {
+        // Try to get restaurants from API first, fallback to static data
+        let cityRestaurants = await fetchRestaurantsFromAPI(destination.city, destination.country)
+        
+        // If API returns empty, try static data
+        if (cityRestaurants.length === 0) {
+          cityRestaurants = getRestaurantsForCity(destination.city)
+        }
+        
+        // Merge with existing restaurants from the destination
+        const existingRestaurants = destination.restaurants || []
+        const mergedRestaurants = cityRestaurants.map(restaurant => {
+          const existing = existingRestaurants.find(existing => existing.id === restaurant.id)
+          return existing ? { ...restaurant, ...existing } : restaurant
+        })
+        newRestaurants[destination.id] = mergedRestaurants
+      } catch (error) {
+        console.error('Error loading restaurants for', destination.city, error)
+        // Fallback to static data
+        const cityRestaurants = getRestaurantsForCity(destination.city)
+        const existingRestaurants = destination.restaurants || []
+        const mergedRestaurants = cityRestaurants.map(restaurant => {
+          const existing = existingRestaurants.find(existing => existing.id === restaurant.id)
+          return existing ? { ...restaurant, ...existing } : restaurant
+        })
+        newRestaurants[destination.id] = mergedRestaurants
+      }
+    }
 
     setRestaurants(newRestaurants)
   }

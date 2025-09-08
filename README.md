@@ -136,6 +136,21 @@ src/
 5. **Find Restaurants**: Discover local cuisine with filtering options
 6. **Plan Your Itinerary**: Use the dashboard to get an overview of your trip
 
+## API Integration
+
+### Real-Time Data for ANY City
+The app now supports **real-time restaurant and attraction data for ANY city worldwide** through Google Places API integration:
+
+- **With Google Places API**: Get real restaurants, attractions, ratings, and photos for any city
+- **Without API Key**: Falls back to curated data for major cities + generic data for others
+- **Hybrid System**: Always provides useful information regardless of API availability
+
+### API Integration Points
+- **Weather**: OpenWeatherMap API (real-time forecasts)
+- **Restaurants & Attractions**: Google Places API (real-time data for ANY city)
+- **Fallback System**: Curated static data for major cities
+- **Transportation**: Static data for major cities with comprehensive guides
+
 ## Features in Detail
 
 ### Weather Integration
