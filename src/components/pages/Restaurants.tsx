@@ -31,30 +31,49 @@ const Restaurants: React.FC = () => {
     
     for (const destination of currentTrip.destinations) {
       try {
-        console.log(`Loading restaurants for ${destination.city}, ${destination.country}`)
+        console.log(`🍽️ DEBUG: Loading restaurants for ${destination.city}, ${destination.country}`)
         
         // Check if we already have restaurants for this destination and don't need to force refresh
         const existingRestaurants = destination.restaurants || []
         if (existingRestaurants.length > 0 && !forceAPI) {
-          console.log(`Using existing restaurants for ${destination.city}`)
+          console.log(`🍽️ DEBUG: Using existing restaurants for ${destination.city}`)
+          console.log(`🍽️ DEBUG: Existing restaurants data:`, existingRestaurants.map(r => ({
+            name: r.name,
+            website: r.website,
+            phone: r.phone,
+            openingHours: r.openingHours
+          })))
           newRestaurants[destination.id] = existingRestaurants
           continue
         }
         
         // Always try API first if forceAPI is true, otherwise try API then fallback
+        console.log(`🍽️ DEBUG: Fetching from API for ${destination.city}`)
         let cityRestaurants = await fetchRestaurantsFromAPI(destination.city, destination.country)
         
-        console.log(`API returned ${cityRestaurants.length} restaurants for ${destination.city}`)
+        console.log(`🍽️ DEBUG: API returned ${cityRestaurants.length} restaurants for ${destination.city}`)
+        console.log(`🍽️ DEBUG: Raw API data:`, cityRestaurants.map(r => ({
+          name: r.name,
+          website: r.website,
+          phone: r.phone,
+          openingHours: r.openingHours
+        })))
         
         // If API returns empty, show empty state
         if (cityRestaurants.length === 0) {
-          console.log(`No restaurants found for ${destination.city}`)
+          console.log(`🍽️ DEBUG: No restaurants found for ${destination.city}`)
         }
         
         // Merge with existing restaurants from the destination
         const mergedRestaurants = cityRestaurants.map(restaurant => {
           const existing = existingRestaurants.find(existing => existing.id === restaurant.id)
-          return existing ? { ...restaurant, ...existing } : restaurant
+          const merged = existing ? { ...restaurant, ...existing } : restaurant
+          console.log(`🍽️ DEBUG: Merged restaurant ${merged.name}:`, {
+            website: merged.website,
+            phone: merged.phone,
+            openingHours: merged.openingHours
+          })
+          return merged
         })
         newRestaurants[destination.id] = mergedRestaurants
         
@@ -62,12 +81,13 @@ const Restaurants: React.FC = () => {
         shouldSaveTrip = true
         
       } catch (error) {
-        console.error('Error loading restaurants for', destination.city, error)
+        console.error('🍽️ DEBUG: Error loading restaurants for', destination.city, error)
         // No fallback data - show empty state
         newRestaurants[destination.id] = []
       }
     }
 
+    console.log(`🍽️ DEBUG: Final restaurants data:`, newRestaurants)
     setRestaurants(newRestaurants)
     
     // Only save the trip if we actually fetched new data
@@ -80,6 +100,15 @@ const Restaurants: React.FC = () => {
       })
       
       const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+      console.log(`🍽️ DEBUG: Saving trip with restaurants:`, updatedTrip.destinations.map(d => ({
+        city: d.city,
+        restaurants: d.restaurants?.map(r => ({
+          name: r.name,
+          website: r.website,
+          phone: r.phone,
+          openingHours: r.openingHours
+        }))
+      })))
       saveTrip(updatedTrip)
     }
   }
@@ -191,26 +220,22 @@ const Restaurants: React.FC = () => {
           </Button>
           
           <Button 
-            onClick={async () => {
-              try {
-                const response = await fetch('/api/places/restaurants?city=Venice&country=Italy&debug=true')
-                const data = await response.json()
-                console.log('🔍 Debug API Response:', data)
-                if (data.success) {
-                  alert(`Debug Results:\nWebsite: ${data.details?.website || 'None'}\nPhone: ${data.details?.phone || 'None'}\nHours: ${data.details?.openingHours ? 'Available' : 'None'}\n\nCheck console for full details.`)
-                } else {
-                  alert(`Debug Failed:\nError: ${data.error}\nStatus: ${data.status}\n\nCheck console for full details.`)
-                }
-              } catch (error) {
-                console.error('Debug API Error:', error)
-                alert('Debug API failed - check console for details')
-              }
+            onClick={() => {
+              console.log('🔍 DEBUG: Current restaurants state:', restaurants)
+              console.log('🔍 DEBUG: Current trip destinations:', currentTrip?.destinations)
+              
+              // Show current restaurant data
+              const allRestaurants = Object.values(restaurants).flat()
+              const restaurantsWithWebsites = allRestaurants.filter(r => r.website)
+              const restaurantsWithHours = allRestaurants.filter(r => r.openingHours && r.openingHours !== 'Hours not available')
+              
+              alert(`Current Restaurant Data:\n\nTotal restaurants: ${allRestaurants.length}\nRestaurants with websites: ${restaurantsWithWebsites.length}\nRestaurants with hours: ${restaurantsWithHours.length}\n\nCheck console for detailed data.`)
             }}
             variant="outline"
             className="flex items-center space-x-2 bg-yellow-100 text-yellow-800"
           >
             <span>🐛</span>
-            <span>Debug API</span>
+            <span>Debug Data</span>
           </Button>
         </div>
       </div>
