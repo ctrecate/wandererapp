@@ -66,7 +66,8 @@ export async function GET(request: NextRequest) {
             rating: place.rating || 4.0,
             mustTryDishes: getDefaultDishesForCuisine(getCuisineFromTypes(place.types)),
             address: place.formattedAddress || `${city}, ${country}`,
-            phone: undefined,
+            phone: place.nationalPhoneNumber || undefined,
+            website: place.websiteUri || undefined,
             openingHours: 'Hours not available', // Not available in new API without additional call
             isBookmarked: false,
             photoUrl: place.photos?.[0] ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` : undefined

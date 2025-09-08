@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { MapPin, Clock, DollarSign, Star, CheckCircle, Circle } from 'lucide-react'
+import { MapPin, Clock, DollarSign, Star, CheckCircle, Circle, Navigation, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { getAttractionsForCity } from '@/data/attractions'
@@ -110,6 +110,18 @@ const Attractions: React.FC = () => {
 
     const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
     saveTrip(updatedTrip)
+  }
+
+  const openGoogleMaps = (attraction: Attraction) => {
+    const query = encodeURIComponent(`${attraction.name} ${attraction.howToGetThere}`)
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`
+    window.open(mapsUrl, '_blank')
+  }
+
+  const openWebsite = (attraction: Attraction) => {
+    if (attraction.website) {
+      window.open(attraction.website, '_blank')
+    }
   }
 
   const getPriceRangeColor = (cost: string) => {
@@ -303,6 +315,28 @@ const Attractions: React.FC = () => {
                             <CheckCircle className="h-4 w-4" />
                             <span>{attraction.isCompleted ? 'Visited' : 'Visit'}</span>
                           </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openGoogleMaps(attraction)}
+                            className="flex items-center space-x-1"
+                          >
+                            <Navigation className="h-4 w-4" />
+                            <span>Directions</span>
+                          </Button>
+                          
+                          {attraction.website && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openWebsite(attraction)}
+                              className="flex items-center space-x-1"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              <span>Website</span>
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>

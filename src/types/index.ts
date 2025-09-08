@@ -42,6 +42,7 @@ export interface Attraction {
   isCompleted?: boolean;
   rating?: number;
   imageUrl?: string;
+  website?: string;
 }
 
 export interface Restaurant {

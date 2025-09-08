@@ -68,6 +68,7 @@ export async function GET(request: NextRequest) {
             duration: '1-3 hours',
             howToGetThere: `Located at ${place.formattedAddress || city}`,
             rating: place.rating || 4.0,
+            website: place.websiteUri || undefined,
             imageUrl: place.photos?.[0] ? 
               `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` :
               undefined
