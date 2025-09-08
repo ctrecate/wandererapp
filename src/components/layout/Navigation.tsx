@@ -33,8 +33,8 @@ const Navigation: React.FC = () => {
 
   // Show different tabs based on whether there's a current trip
   const tabs = currentTrip 
-    ? allTabs.filter(tab => tab.id !== 'trips') // Hide trips tab when viewing a specific trip
-    : [{ id: 'trips' as TabType, label: 'My Trips', icon: FolderOpen }] // Only show trips tab when no trip selected
+    ? allTabs.filter(tab => tab.id !== 'api-test' && tab.id !== 'places-debug') // Hide debug tabs when viewing a specific trip
+    : allTabs.filter(tab => tab.id === 'trips' || tab.id === 'api-test' || tab.id === 'places-debug') // Show trips and debug tabs when no trip selected
 
   return (
     <nav className="bg-white border-b border-gray-200">

@@ -45,7 +45,17 @@ const Attractions: React.FC = () => {
         })
         newAttractions[destination.id] = mergedAttractions
         
-        // Don't auto-save to prevent flashing - just store in local state
+        // Save the fetched attractions to the trip destination
+        const updatedDestinations = currentTrip.destinations.map(dest => {
+          if (dest.id === destination.id) {
+            return { ...dest, attractions: mergedAttractions }
+          }
+          return dest
+        })
+        
+        const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+        saveTrip(updatedTrip)
+        
       } catch (error) {
         console.error('Error loading attractions for', destination.city, error)
         // No fallback data - show empty state
