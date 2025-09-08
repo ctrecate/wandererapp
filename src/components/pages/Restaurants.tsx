@@ -270,7 +270,7 @@ const Restaurants: React.FC = () => {
                   
                   // Show all restaurants with their details
                   console.log('🧪 TEST: All restaurants details:')
-                  data.restaurants.forEach((r, i) => {
+                  data.restaurants.forEach((r: any, i: number) => {
                     console.log(`Restaurant ${i + 1}: ${r.name}`, {
                       website: r.website,
                       phone: r.phone,
@@ -280,8 +280,8 @@ const Restaurants: React.FC = () => {
                     })
                   })
                   
-                  const restaurantsWithWebsites = data.restaurants.filter(r => r.website)
-                  const restaurantsWithPhones = data.restaurants.filter(r => r.phone)
+                  const restaurantsWithWebsites = data.restaurants.filter((r: any) => r.website)
+                  const restaurantsWithPhones = data.restaurants.filter((r: any) => r.phone)
                   
                   alert(`Direct API Test Results:\n\nRestaurant: ${firstRestaurant.name}\nWebsite: "${firstRestaurant.website || 'NONE'}"\nPhone: "${firstRestaurant.phone || 'NONE'}"\nHours: "${firstRestaurant.openingHours || 'NONE'}"\n\nTotal restaurants: ${data.restaurants.length}\nRestaurants with websites: ${restaurantsWithWebsites.length}\nRestaurants with phones: ${restaurantsWithPhones.length}\n\nCheck console for full data.`)
                 } else {
