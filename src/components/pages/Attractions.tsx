@@ -44,6 +44,17 @@ const Attractions: React.FC = () => {
           return existing ? { ...attraction, ...existing } : attraction
         })
         newAttractions[destination.id] = mergedAttractions
+        
+        // Save attractions to the trip destination
+        if (cityAttractions.length > 0) {
+          const updatedDestinations = currentTrip.destinations.map(dest => 
+            dest.id === destination.id 
+              ? { ...dest, attractions: mergedAttractions }
+              : dest
+          )
+          const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+          saveTrip(updatedTrip)
+        }
       } catch (error) {
         console.error('Error loading attractions for', destination.city, error)
         // No fallback data - show empty state
@@ -208,17 +219,33 @@ const Attractions: React.FC = () => {
                     <div key={attraction.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="text-lg font-medium text-gray-900">{attraction.name}</h3>
-                            {attraction.rating && (
-                              <div className="flex items-center space-x-1">
-                                <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                                <span className="text-sm text-gray-600">{attraction.rating}</span>
+                          <div className="flex items-start space-x-4">
+                            {attraction.imageUrl && (
+                              <div className="flex-shrink-0">
+                                <img 
+                                  src={attraction.imageUrl} 
+                                  alt={attraction.name}
+                                  className="w-20 h-20 object-cover rounded-lg"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none'
+                                  }}
+                                />
                               </div>
                             )}
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="text-lg font-medium text-gray-900">{attraction.name}</h3>
+                                {attraction.rating && (
+                                  <div className="flex items-center space-x-1">
+                                    <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                                    <span className="text-sm text-gray-600">{attraction.rating}</span>
+                                  </div>
+                                )}
+                              </div>
+                              
+                              <p className="text-gray-600 mb-3">{attraction.description}</p>
+                            </div>
                           </div>
-                          
-                          <p className="text-gray-600 mb-3">{attraction.description}</p>
                           
                           <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-3">
                             <div className="flex items-center space-x-1">

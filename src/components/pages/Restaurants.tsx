@@ -49,6 +49,17 @@ const Restaurants: React.FC = () => {
           return existing ? { ...restaurant, ...existing } : restaurant
         })
         newRestaurants[destination.id] = mergedRestaurants
+        
+        // Save restaurants to the trip destination
+        if (cityRestaurants.length > 0) {
+          const updatedDestinations = currentTrip.destinations.map(dest => 
+            dest.id === destination.id 
+              ? { ...dest, restaurants: mergedRestaurants }
+              : dest
+          )
+          const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+          saveTrip(updatedTrip)
+        }
       } catch (error) {
         console.error('Error loading restaurants for', destination.city, error)
         // No fallback data - show empty state
@@ -274,18 +285,34 @@ const Restaurants: React.FC = () => {
                     <div key={restaurant.id} className="border border-gray-200 rounded-lg p-4">
                       <div className="flex items-start justify-between">
                         <div className="flex-1">
-                          <div className="flex items-center space-x-2 mb-2">
-                            <h3 className="text-lg font-medium text-gray-900">{restaurant.name}</h3>
-                            <div className="flex items-center space-x-1">
-                              <Star className="h-4 w-4 text-yellow-400 fill-current" />
-                              <span className="text-sm text-gray-600">{restaurant.rating}</span>
+                          <div className="flex items-start space-x-4">
+                            {restaurant.photoUrl && (
+                              <div className="flex-shrink-0">
+                                <img 
+                                  src={restaurant.photoUrl} 
+                                  alt={restaurant.name}
+                                  className="w-20 h-20 object-cover rounded-lg"
+                                  onError={(e) => {
+                                    e.currentTarget.style.display = 'none'
+                                  }}
+                                />
+                              </div>
+                            )}
+                            <div className="flex-1">
+                              <div className="flex items-center space-x-2 mb-2">
+                                <h3 className="text-lg font-medium text-gray-900">{restaurant.name}</h3>
+                                <div className="flex items-center space-x-1">
+                                  <Star className="h-4 w-4 text-yellow-400 fill-current" />
+                                  <span className="text-sm text-gray-600">{restaurant.rating}</span>
+                                </div>
+                                <span className={cn('px-2 py-1 rounded-full text-xs font-medium', getPriceRangeColor(restaurant.priceRange))}>
+                                  {getPriceRangeDisplay(restaurant.priceRange)}
+                                </span>
+                              </div>
+                              
+                              <p className="text-sm text-gray-600 mb-2">{restaurant.cuisine}</p>
                             </div>
-                            <span className={cn('px-2 py-1 rounded-full text-xs font-medium', getPriceRangeColor(restaurant.priceRange))}>
-                              {getPriceRangeDisplay(restaurant.priceRange)}
-                            </span>
                           </div>
-                          
-                          <p className="text-sm text-gray-600 mb-2">{restaurant.cuisine}</p>
                           
                           <div className="flex flex-wrap gap-4 text-sm text-gray-500 mb-3">
                             <div className="flex items-center space-x-1">

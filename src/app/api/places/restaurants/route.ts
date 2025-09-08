@@ -68,7 +68,8 @@ export async function GET(request: NextRequest) {
             address: place.formattedAddress || `${city}, ${country}`,
             phone: undefined,
             openingHours: 'Hours not available', // Not available in new API without additional call
-            isBookmarked: false
+            isBookmarked: false,
+            photoUrl: place.photos?.[0] ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` : undefined
           }))
 
           return NextResponse.json({ restaurants, source: 'google_places_api' })

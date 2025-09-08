@@ -56,6 +56,7 @@ export interface Restaurant {
   website?: string;
   openingHours?: string;
   isBookmarked?: boolean;
+  photoUrl?: string;
 }
 
 export interface CustomExcursion {
