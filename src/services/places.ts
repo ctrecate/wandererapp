@@ -30,7 +30,7 @@ export interface GooglePlacesResponse {
 export async function fetchRestaurantsFromAPI(city: string, country: string): Promise<Restaurant[]> {
   console.log('Google Places API Key:', GOOGLE_PLACES_API_KEY ? 'Present' : 'Missing')
   
-  if (GOOGLE_PLACES_API_KEY === 'demo-key' || !GOOGLE_PLACES_API_KEY) {
+  if (!GOOGLE_PLACES_API_KEY) {
     console.log('Using mock data - no valid API key')
     return getMockRestaurantsForCity(city)
   }
@@ -90,7 +90,7 @@ export async function fetchRestaurantsFromAPI(city: string, country: string): Pr
 export async function fetchAttractionsFromAPI(city: string, country: string): Promise<Attraction[]> {
   console.log('Google Places API Key for attractions:', GOOGLE_PLACES_API_KEY ? 'Present' : 'Missing')
   
-  if (GOOGLE_PLACES_API_KEY === 'demo-key' || !GOOGLE_PLACES_API_KEY) {
+  if (!GOOGLE_PLACES_API_KEY) {
     console.log('Using mock data for attractions - no valid API key')
     return getMockAttractionsForCity(city)
   }
