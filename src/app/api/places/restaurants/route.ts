@@ -105,6 +105,7 @@ export async function GET(request: NextRequest) {
     }
 
     console.log('🍽️ Server: Fetching restaurants for', city, country)
+    console.log('🍽️ Server: Using API key:', GOOGLE_PLACES_API_KEY.substring(0, 10) + '...')
 
     // Try multiple query formats
     const queries = [
@@ -149,6 +150,7 @@ export async function GET(request: NextRequest) {
 
         if (data.places && data.places.length > 0) {
           console.log(`✅ Server: Found ${data.places.length} restaurants`)
+          console.log('📊 Server: First place data:', JSON.stringify(data.places[0], null, 2))
           
           // Get detailed information for each place
           const restaurants = await Promise.all(
@@ -162,8 +164,9 @@ export async function GET(request: NextRequest) {
               // Get detailed place information using POST request
               try {
                 const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}`
-                console.log('🔍 Server: Fetching details for place:', place.id)
+                console.log('🔍 Server: Fetching details for place:', place.id, place.displayName?.text)
                 console.log('🔍 Server: Details URL:', detailsUrl)
+                console.log('🔍 Server: API Key (first 10 chars):', GOOGLE_PLACES_API_KEY.substring(0, 10))
                 
                 const detailsResponse = await fetch(detailsUrl, {
                   method: 'POST',
@@ -176,10 +179,11 @@ export async function GET(request: NextRequest) {
                 })
 
                 console.log('📡 Server: Details response status:', detailsResponse.status, detailsResponse.statusText)
+                console.log('📡 Server: Details response headers:', Object.fromEntries(detailsResponse.headers.entries()))
 
                 if (detailsResponse.ok) {
                   const detailsData = await detailsResponse.json()
-                  console.log('📊 Server: Details data for', place.displayName?.text, ':', detailsData)
+                  console.log('📊 Server: Raw details data for', place.displayName?.text, ':', JSON.stringify(detailsData, null, 2))
                   
                   detailedInfo = {
                     website: detailsData.websiteUri || undefined,
@@ -191,9 +195,42 @@ export async function GET(request: NextRequest) {
                 } else {
                   const errorText = await detailsResponse.text()
                   console.log('❌ Server: Details API error:', detailsResponse.status, errorText)
+                  console.log('❌ Server: Full error response:', errorText)
+                  
+                  // Try alternative field mask if the first one fails
+                  if (detailsResponse.status === 400) {
+                    console.log('🔄 Server: Trying alternative field mask...')
+                    try {
+                      const altResponse = await fetch(detailsUrl, {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+                          'X-Goog-FieldMask': 'displayName,formattedAddress,websiteUri,nationalPhoneNumber'
+                        },
+                        body: JSON.stringify({})
+                      })
+                      
+                      if (altResponse.ok) {
+                        const altData = await altResponse.json()
+                        console.log('📊 Server: Alternative details data:', JSON.stringify(altData, null, 2))
+                        
+                        detailedInfo = {
+                          website: altData.websiteUri || undefined,
+                          phone: altData.nationalPhoneNumber || undefined,
+                          openingHours: 'Hours not available'
+                        }
+                        
+                        console.log('✅ Server: Alternative extracted info:', detailedInfo)
+                      }
+                    } catch (altError) {
+                      console.log('❌ Server: Alternative request also failed:', altError)
+                    }
+                  }
                 }
               } catch (error) {
                 console.log('⚠️ Server: Could not fetch detailed info for place:', place.id, error)
+                console.log('⚠️ Server: Error details:', error instanceof Error ? error.message : 'Unknown error')
               }
 
               const restaurant = {
