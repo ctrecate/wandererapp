@@ -191,7 +191,7 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     if (!user) return
     
     localStorage.removeItem(`trip_${user.id}_${tripId}`)
-    if (currentTrip?.id === tripId) {
+    if (state.currentTrip?.id === tripId) {
       setCurrentTrip(null)
       localStorage.removeItem(`currentTripId_${user.id}`)
     }

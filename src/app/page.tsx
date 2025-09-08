@@ -84,7 +84,7 @@ function AppContent() {
 
   return (
     <>
-      <Layout onCreateTrip={handleCreateTrip}>
+      <Layout>
         {renderActiveTab()}
       </Layout>
       
