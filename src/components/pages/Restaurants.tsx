@@ -193,10 +193,14 @@ const Restaurants: React.FC = () => {
           <Button 
             onClick={async () => {
               try {
-                const response = await fetch('/api/places/debug')
+                const response = await fetch('/api/places/restaurants?city=Venice&country=Italy&debug=true')
                 const data = await response.json()
                 console.log('🔍 Debug API Response:', data)
-                alert(`Debug Results:\nWebsite: ${data.details?.website || 'None'}\nPhone: ${data.details?.phone || 'None'}\nHours: ${data.details?.openingHours ? 'Available' : 'None'}\n\nCheck console for full details.`)
+                if (data.success) {
+                  alert(`Debug Results:\nWebsite: ${data.details?.website || 'None'}\nPhone: ${data.details?.phone || 'None'}\nHours: ${data.details?.openingHours ? 'Available' : 'None'}\n\nCheck console for full details.`)
+                } else {
+                  alert(`Debug Failed:\nError: ${data.error}\nStatus: ${data.status}\n\nCheck console for full details.`)
+                }
               } catch (error) {
                 console.error('Debug API Error:', error)
                 alert('Debug API failed - check console for details')
