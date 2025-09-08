@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Input } from '@/components/ui/Input'
 import { Modal } from '@/components/ui/Modal'
+import { PlaceAutocomplete } from '@/components/forms/PlaceAutocomplete'
 import { useApp } from '@/context/AppContext'
 import type { Destination } from '@/types'
 import { generateId } from '@/lib/utils'
@@ -25,8 +26,19 @@ const DestinationForm: React.FC<DestinationFormProps> = ({
     startDate: destination?.startDate ? destination.startDate.toISOString().split('T')[0] : '',
     endDate: destination?.endDate ? destination.endDate.toISOString().split('T')[0] : '',
   })
+  const [placeInput, setPlaceInput] = useState(
+    destination ? `${destination.city}, ${destination.country}` : ''
+  )
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Record<string, string>>({})
+
+  const handlePlaceSelect = (city: string, country: string) => {
+    setFormData(prev => ({
+      ...prev,
+      city: city,
+      country: country
+    }))
+  }
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
@@ -89,6 +101,7 @@ const DestinationForm: React.FC<DestinationFormProps> = ({
       startDate: '',
       endDate: '',
     })
+    setPlaceInput('')
     setErrors({})
     onClose()
   }
@@ -101,23 +114,20 @@ const DestinationForm: React.FC<DestinationFormProps> = ({
       size="md"
     >
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="City"
-            placeholder="e.g., Paris"
-            value={formData.city}
-            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-            error={errors.city}
-            required
+        <div className="space-y-2">
+          <label className="block text-sm font-medium text-gray-700">
+            Destination <span className="text-red-500">*</span>
+          </label>
+          <PlaceAutocomplete
+            value={placeInput}
+            onChange={setPlaceInput}
+            onSelect={handlePlaceSelect}
+            placeholder="Start typing a city name..."
+            className={errors.city || errors.country ? 'border-red-500' : ''}
           />
-          <Input
-            label="Country"
-            placeholder="e.g., France"
-            value={formData.country}
-            onChange={(e) => setFormData({ ...formData, country: e.target.value })}
-            error={errors.country}
-            required
-          />
+          {(errors.city || errors.country) && (
+            <p className="text-sm text-red-500">{errors.city || errors.country}</p>
+          )}
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
