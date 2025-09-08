@@ -1,5 +1,5 @@
 import React from 'react'
-import { MapPin, Calendar, Cloud, Camera, Bus, Utensils, Plus } from 'lucide-react'
+import { MapPin, Calendar, Camera, Utensils, Plus, Heart, CheckCircle, Star } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { formatDateRange, getDaysBetween } from '@/lib/utils'
@@ -40,6 +40,14 @@ const Dashboard: React.FC = () => {
     return total + (dest.customExcursions?.length || 0)
   }, 0)
 
+  const plannedAttractions = currentTrip.destinations.reduce((total, dest) => {
+    return total + (dest.attractions?.filter(attr => attr.isPlanned).length || 0)
+  }, 0)
+
+  const savedRestaurants = currentTrip.destinations.reduce((total, dest) => {
+    return total + (dest.restaurants?.filter(rest => rest.isBookmarked).length || 0)
+  }, 0)
+
   const stats = [
     {
       name: 'Destinations',
@@ -56,15 +64,15 @@ const Dashboard: React.FC = () => {
       bgColor: 'bg-green-100',
     },
     {
-      name: 'Attractions',
-      value: totalAttractions,
+      name: 'Planned Attractions',
+      value: plannedAttractions,
       icon: Camera,
       color: 'text-purple-600',
       bgColor: 'bg-purple-100',
     },
     {
-      name: 'Restaurants',
-      value: totalRestaurants,
+      name: 'Saved Restaurants',
+      value: savedRestaurants,
       icon: Utensils,
       color: 'text-orange-600',
       bgColor: 'bg-orange-100',
@@ -128,28 +136,142 @@ const Dashboard: React.FC = () => {
         )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <Cloud className="h-6 w-6 text-blue-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Check Weather</span>
-          </button>
-          <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <Camera className="h-6 w-6 text-purple-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Find Attractions</span>
-          </button>
-          <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <Bus className="h-6 w-6 text-green-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Transport Info</span>
-          </button>
-          <button className="flex flex-col items-center p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-            <Utensils className="h-6 w-6 text-orange-600 mb-2" />
-            <span className="text-sm font-medium text-gray-900">Find Restaurants</span>
-          </button>
+      {/* Planned Attractions */}
+      {plannedAttractions > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Planned Attractions</h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveTab('attractions')}
+              className="flex items-center space-x-1"
+            >
+              <Camera className="h-4 w-4" />
+              <span>View All</span>
+            </Button>
+          </div>
+          <div className="space-y-3">
+            {currentTrip.destinations.map(destination => {
+              const plannedAttractions = destination.attractions?.filter(attr => attr.isPlanned) || []
+              if (plannedAttractions.length === 0) return null
+              
+              return (
+                <div key={destination.id} className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                    {destination.city}, {destination.country}
+                  </h3>
+                  <div className="space-y-2">
+                    {plannedAttractions.slice(0, 3).map(attraction => (
+                      <div key={attraction.id} className="flex items-center space-x-3">
+                        <CheckCircle className="h-4 w-4 text-green-600 flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{attraction.name}</span>
+                        {attraction.rating && (
+                          <div className="flex items-center space-x-1 ml-auto">
+                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                            <span className="text-xs text-gray-500">{attraction.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {plannedAttractions.length > 3 && (
+                      <p className="text-xs text-gray-500 ml-7">
+                        +{plannedAttractions.length - 3} more planned attractions
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
         </div>
-      </div>
+      )}
+
+      {/* Saved Restaurants */}
+      {savedRestaurants > 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-gray-900">Saved Restaurants</h2>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setActiveTab('restaurants')}
+              className="flex items-center space-x-1"
+            >
+              <Utensils className="h-4 w-4" />
+              <span>View All</span>
+            </Button>
+          </div>
+          <div className="space-y-3">
+            {currentTrip.destinations.map(destination => {
+              const savedRestaurants = destination.restaurants?.filter(rest => rest.isBookmarked) || []
+              if (savedRestaurants.length === 0) return null
+              
+              return (
+                <div key={destination.id} className="border border-gray-200 rounded-lg p-4">
+                  <h3 className="text-sm font-medium text-gray-900 mb-2">
+                    {destination.city}, {destination.country}
+                  </h3>
+                  <div className="space-y-2">
+                    {savedRestaurants.slice(0, 3).map(restaurant => (
+                      <div key={restaurant.id} className="flex items-center space-x-3">
+                        <Heart className="h-4 w-4 text-red-600 fill-current flex-shrink-0" />
+                        <span className="text-sm text-gray-700">{restaurant.name}</span>
+                        <span className="text-xs text-gray-500 ml-auto">{restaurant.cuisine}</span>
+                        {restaurant.rating && (
+                          <div className="flex items-center space-x-1">
+                            <Star className="h-3 w-3 text-yellow-400 fill-current" />
+                            <span className="text-xs text-gray-500">{restaurant.rating}</span>
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                    {savedRestaurants.length > 3 && (
+                      <p className="text-xs text-gray-500 ml-7">
+                        +{savedRestaurants.length - 3} more saved restaurants
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
+      {/* Empty State for No Saved Items */}
+      {plannedAttractions === 0 && savedRestaurants === 0 && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <div className="text-center py-8">
+            <div className="flex justify-center space-x-4 mb-4">
+              <Camera className="h-8 w-8 text-gray-400" />
+              <Utensils className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 mb-2">Start Planning Your Trip</h3>
+            <p className="text-gray-500 mb-4">
+              Save restaurants and plan attractions to see them here on your dashboard.
+            </p>
+            <div className="flex justify-center space-x-3">
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab('attractions')}
+                className="flex items-center space-x-2"
+              >
+                <Camera className="h-4 w-4" />
+                <span>Find Attractions</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setActiveTab('restaurants')}
+                className="flex items-center space-x-2"
+              >
+                <Utensils className="h-4 w-4" />
+                <span>Find Restaurants</span>
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
