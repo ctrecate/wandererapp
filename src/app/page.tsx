@@ -11,6 +11,7 @@ import { Attractions } from '@/components/pages/Attractions'
 import { Restaurants } from '@/components/pages/Restaurants'
 import { Outfits } from '@/components/pages/Outfits'
 import { Transportation } from '@/components/pages/Transportation'
+import { APITest } from '@/components/debug/APITest'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 function AppContent() {
@@ -58,6 +59,8 @@ function AppContent() {
         return <div className="text-center py-12"><p className="text-gray-500">Custom excursions coming soon...</p></div>
       case 'restaurants':
         return <Restaurants />
+      case 'api-test':
+        return <APITest />
       default:
         return <Dashboard />
     }

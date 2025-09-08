@@ -23,18 +23,23 @@ const Restaurants: React.FC = () => {
     }
   }, [currentTrip?.destinations])
 
-  const loadRestaurantsForDestinations = async () => {
+  const loadRestaurantsForDestinations = async (forceAPI = false) => {
     if (!currentTrip) return
 
     const newRestaurants: Record<string, Restaurant[]> = {}
     
     for (const destination of currentTrip.destinations) {
       try {
-        // Try to get restaurants from API first, fallback to static data
+        console.log(`Loading restaurants for ${destination.city}, ${destination.country}`)
+        
+        // Always try API first if forceAPI is true, otherwise try API then fallback
         let cityRestaurants = await fetchRestaurantsFromAPI(destination.city, destination.country)
         
-        // If API returns empty, try static data
-        if (cityRestaurants.length === 0) {
+        console.log(`API returned ${cityRestaurants.length} restaurants for ${destination.city}`)
+        
+        // If API returns empty and we're not forcing API, try static data
+        if (cityRestaurants.length === 0 && !forceAPI) {
+          console.log(`No API results, trying static data for ${destination.city}`)
           cityRestaurants = getRestaurantsForCity(destination.city)
         }
         
@@ -143,9 +148,19 @@ const Restaurants: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Restaurants & Dining</h1>
-        <p className="text-gray-600">Discover local cuisine and dining recommendations</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Restaurants & Dining</h1>
+          <p className="text-gray-600">Discover local cuisine and dining recommendations</p>
+        </div>
+        <Button 
+          onClick={() => loadRestaurantsForDestinations(true)}
+          variant="outline"
+          className="flex items-center space-x-2"
+        >
+          <span>🔄</span>
+          <span>Force Refresh from Google Places</span>
+        </Button>
       </div>
 
       {/* Filters */}

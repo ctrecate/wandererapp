@@ -1,6 +1,7 @@
 import type { Restaurant, Attraction } from '@/types'
 
-const GOOGLE_PLACES_API_KEY = process.env.NEXT_PUBLIC_GOOGLE_PLACES_API_KEY || 'AIzaSyA_s8qPRrFrKfAvAU_N-CmIumtmDTHUmik'
+// Use the provided API key directly
+const GOOGLE_PLACES_API_KEY = 'AIzaSyA_s8qPRrFrKfAvAU_N-CmIumtmDTHUmik'
 
 export interface GooglePlace {
   place_id: string
@@ -27,7 +28,10 @@ export interface GooglePlacesResponse {
 
 // Fetch restaurants from Google Places API
 export async function fetchRestaurantsFromAPI(city: string, country: string): Promise<Restaurant[]> {
-  if (GOOGLE_PLACES_API_KEY === 'demo-key') {
+  console.log('Google Places API Key:', GOOGLE_PLACES_API_KEY ? 'Present' : 'Missing')
+  
+  if (GOOGLE_PLACES_API_KEY === 'demo-key' || !GOOGLE_PLACES_API_KEY) {
+    console.log('Using mock data - no valid API key')
     return getMockRestaurantsForCity(city)
   }
 
@@ -84,7 +88,10 @@ export async function fetchRestaurantsFromAPI(city: string, country: string): Pr
 
 // Fetch attractions from Google Places API
 export async function fetchAttractionsFromAPI(city: string, country: string): Promise<Attraction[]> {
-  if (GOOGLE_PLACES_API_KEY === 'demo-key') {
+  console.log('Google Places API Key for attractions:', GOOGLE_PLACES_API_KEY ? 'Present' : 'Missing')
+  
+  if (GOOGLE_PLACES_API_KEY === 'demo-key' || !GOOGLE_PLACES_API_KEY) {
+    console.log('Using mock data for attractions - no valid API key')
     return getMockAttractionsForCity(city)
   }
 

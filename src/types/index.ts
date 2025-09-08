@@ -119,7 +119,7 @@ export interface PackingList {
   toiletries: string[];
 }
 
-export type TabType = 'dashboard' | 'destinations' | 'weather' | 'outfits' | 'attractions' | 'transportation' | 'excursions' | 'restaurants';
+export type TabType = 'dashboard' | 'destinations' | 'weather' | 'outfits' | 'attractions' | 'transportation' | 'excursions' | 'restaurants' | 'api-test';
 
 export interface AppState {
   currentTrip: Trip | null;
