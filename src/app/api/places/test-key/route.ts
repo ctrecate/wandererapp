@@ -51,7 +51,13 @@ export async function GET(request: NextRequest) {
     
     // Test 2: Details request
     console.log('🔑 Test 2: Details request')
+    console.log('🔑 Place ID:', place.id)
+    console.log('🔑 Place ID type:', typeof place.id)
+    console.log('🔑 Place ID length:', place.id?.length)
+    
     const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}`
+    console.log('🔑 Details URL:', detailsUrl)
+    
     const detailsResponse = await fetch(detailsUrl, {
       method: 'POST',
       headers: {
@@ -67,6 +73,51 @@ export async function GET(request: NextRequest) {
     if (!detailsResponse.ok) {
       const errorText = await detailsResponse.text()
       console.log('🔑 Details error:', errorText)
+      
+      // Try alternative field mask if 404
+      if (detailsResponse.status === 404) {
+        console.log('🔑 Trying alternative field mask for details...')
+        try {
+          const altResponse = await fetch(detailsUrl, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+              'X-Goog-FieldMask': 'displayName,formattedAddress,websiteUri,nationalPhoneNumber'
+            },
+            body: JSON.stringify({})
+          })
+          
+          console.log('🔑 Alternative details response status:', altResponse.status)
+          
+          if (altResponse.ok) {
+            const altData = await altResponse.json()
+            console.log('🔑 Alternative details data:', altData)
+            
+            return NextResponse.json({
+              success: true,
+              place: {
+                id: place.id,
+                name: place.displayName?.text,
+                types: place.types
+              },
+              details: {
+                website: altData.websiteUri || null,
+                phone: altData.nationalPhoneNumber || null,
+                openingHours: null
+              },
+              rawDetails: altData,
+              note: 'Used alternative field mask'
+            })
+          } else {
+            const altErrorText = await altResponse.text()
+            console.log('🔑 Alternative details error:', altErrorText)
+          }
+        } catch (altError) {
+          console.log('🔑 Alternative request failed:', altError)
+        }
+      }
+      
       return NextResponse.json({
         success: false,
         error: 'Details failed',
