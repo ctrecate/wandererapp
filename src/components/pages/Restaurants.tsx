@@ -50,16 +50,7 @@ const Restaurants: React.FC = () => {
         })
         newRestaurants[destination.id] = mergedRestaurants
         
-        // Save restaurants to the trip destination
-        if (cityRestaurants.length > 0) {
-          const updatedDestinations = currentTrip.destinations.map(dest => 
-            dest.id === destination.id 
-              ? { ...dest, restaurants: mergedRestaurants }
-              : dest
-          )
-          const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
-          saveTrip(updatedTrip)
-        }
+        // Don't auto-save to prevent flashing - just store in local state
       } catch (error) {
         console.error('Error loading restaurants for', destination.city, error)
         // No fallback data - show empty state
@@ -71,25 +62,7 @@ const Restaurants: React.FC = () => {
   }
 
   const toggleBookmark = (destinationId: string, restaurantId: string) => {
-    if (!currentTrip) return
-
-    const updatedDestinations = currentTrip.destinations.map(destination => {
-      if (destination.id === destinationId) {
-        const updatedRestaurants = (destination.restaurants || []).map(restaurant => {
-          if (restaurant.id === restaurantId) {
-            return { ...restaurant, isBookmarked: !restaurant.isBookmarked }
-          }
-          return restaurant
-        })
-        return { ...destination, restaurants: updatedRestaurants }
-      }
-      return destination
-    })
-
-    const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
-    saveTrip(updatedTrip)
-    
-    // Update local state
+    // Just update local state - no auto-saving to prevent flashing
     setRestaurants(prev => ({
       ...prev,
       [destinationId]: prev[destinationId]?.map(restaurant => {

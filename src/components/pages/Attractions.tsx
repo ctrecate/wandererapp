@@ -45,16 +45,7 @@ const Attractions: React.FC = () => {
         })
         newAttractions[destination.id] = mergedAttractions
         
-        // Save attractions to the trip destination
-        if (cityAttractions.length > 0) {
-          const updatedDestinations = currentTrip.destinations.map(dest => 
-            dest.id === destination.id 
-              ? { ...dest, attractions: mergedAttractions }
-              : dest
-          )
-          const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
-          saveTrip(updatedTrip)
-        }
+        // Don't auto-save to prevent flashing - just store in local state
       } catch (error) {
         console.error('Error loading attractions for', destination.city, error)
         // No fallback data - show empty state
@@ -66,30 +57,7 @@ const Attractions: React.FC = () => {
   }
 
   const toggleAttractionStatus = (destinationId: string, attractionId: string, status: 'isPlanned' | 'isCompleted') => {
-    if (!currentTrip) return
-
-    const updatedDestinations = currentTrip.destinations.map(destination => {
-      if (destination.id === destinationId) {
-        const updatedAttractions = (destination.attractions || []).map(attraction => {
-          if (attraction.id === attractionId) {
-            return {
-              ...attraction,
-              [status]: !attraction[status],
-              // If marking as completed, also mark as planned
-              ...(status === 'isCompleted' && !attraction.isCompleted ? { isPlanned: true } : {})
-            }
-          }
-          return attraction
-        })
-        return { ...destination, attractions: updatedAttractions }
-      }
-      return destination
-    })
-
-    const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
-    saveTrip(updatedTrip)
-    
-    // Update local state
+    // Just update local state - no auto-saving to prevent flashing
     setAttractions(prev => ({
       ...prev,
       [destinationId]: prev[destinationId]?.map(attraction => {
@@ -97,6 +65,7 @@ const Attractions: React.FC = () => {
           return {
             ...attraction,
             [status]: !attraction[status],
+            // If marking as completed, also mark as planned
             ...(status === 'isCompleted' && !attraction.isCompleted ? { isPlanned: true } : {})
           }
         }
