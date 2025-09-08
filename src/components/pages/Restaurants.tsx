@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { Utensils, Star, MapPin, Phone, Clock, Heart, Filter } from 'lucide-react'
+import { Utensils, Star, MapPin, Phone, Clock, Heart, Filter, Navigation, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { getRestaurantsForCity } from '@/data/restaurants'
@@ -110,6 +110,18 @@ const Restaurants: React.FC = () => {
 
     const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
     saveTrip(updatedTrip)
+  }
+
+  const openGoogleMaps = (restaurant: Restaurant) => {
+    const query = encodeURIComponent(`${restaurant.name} ${restaurant.address}`)
+    const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${query}`
+    window.open(mapsUrl, '_blank')
+  }
+
+  const openWebsite = (restaurant: Restaurant) => {
+    if (restaurant.website) {
+      window.open(restaurant.website, '_blank')
+    }
   }
 
   const getPriceRangeDisplay = (priceRange: number) => {
@@ -358,7 +370,7 @@ const Restaurants: React.FC = () => {
                           )}
                         </div>
                         
-                        <div className="ml-4">
+                        <div className="ml-4 flex flex-col space-y-2">
                           <Button
                             variant={restaurant.isBookmarked ? 'secondary' : 'outline'}
                             size="sm"
@@ -368,6 +380,28 @@ const Restaurants: React.FC = () => {
                             <Heart className={cn('h-4 w-4', restaurant.isBookmarked ? 'fill-current' : '')} />
                             <span>{restaurant.isBookmarked ? 'Saved' : 'Save'}</span>
                           </Button>
+                          
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => openGoogleMaps(restaurant)}
+                            className="flex items-center space-x-1"
+                          >
+                            <Navigation className="h-4 w-4" />
+                            <span>Directions</span>
+                          </Button>
+                          
+                          {restaurant.website && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => openWebsite(restaurant)}
+                              className="flex items-center space-x-1"
+                            >
+                              <ExternalLink className="h-4 w-4" />
+                              <span>Website</span>
+                            </Button>
+                          )}
                         </div>
                       </div>
                     </div>
