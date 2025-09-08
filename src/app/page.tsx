@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react'
 import { AppProvider, useApp } from '@/context/AppContext'
+import { AuthProvider, useAuth } from '@/context/AuthContext'
 import { Layout } from '@/components/layout/Layout'
 import { TripForm } from '@/components/forms/TripForm'
 import { Dashboard } from '@/components/pages/Dashboard'
@@ -13,7 +14,9 @@ import { Outfits } from '@/components/pages/Outfits'
 import { Transportation } from '@/components/pages/Transportation'
 import { APITest } from '@/components/debug/APITest'
 import { PlacesDebugger } from '@/components/debug/PlacesDebugger'
+import { TripsOverview } from '@/components/pages/TripsOverview'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { AuthWrapper } from '@/components/auth/AuthWrapper'
 
 function AppContent() {
   const { currentTrip, activeTab, isLoading } = useApp()
@@ -62,10 +65,12 @@ function AppContent() {
         return <Restaurants />
       case 'api-test':
         return <APITest />
-      case 'places-debug':
-        return <PlacesDebugger />
-      default:
-        return <Dashboard />
+        case 'places-debug':
+          return <PlacesDebugger />
+        case 'trips':
+          return <TripsOverview />
+        default:
+          return <Dashboard />
     }
   }
 
@@ -93,8 +98,12 @@ function AppContent() {
 
 export default function Home() {
   return (
-    <AppProvider>
-      <AppContent />
-    </AppProvider>
+    <AuthProvider>
+      <AppProvider>
+        <AuthWrapper>
+          <AppContent />
+        </AuthWrapper>
+      </AppProvider>
+    </AuthProvider>
   )
 }

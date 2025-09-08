@@ -7,9 +7,10 @@ import { useApp } from '@/context/AppContext'
 interface TripFormProps {
   isOpen: boolean
   onClose: () => void
+  onTripCreated?: () => void
 }
 
-const TripForm: React.FC<TripFormProps> = ({ isOpen, onClose }) => {
+const TripForm: React.FC<TripFormProps> = ({ isOpen, onClose, onTripCreated }) => {
   const [tripName, setTripName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
   const { createNewTrip } = useApp()
@@ -24,6 +25,7 @@ const TripForm: React.FC<TripFormProps> = ({ isOpen, onClose }) => {
       createNewTrip(tripName.trim())
       setTripName('')
       onClose()
+      onTripCreated?.()
     } catch (error) {
       console.error('Error creating trip:', error)
     } finally {

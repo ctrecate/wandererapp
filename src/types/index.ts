@@ -120,7 +120,7 @@ export interface PackingList {
   toiletries: string[];
 }
 
-export type TabType = 'dashboard' | 'destinations' | 'weather' | 'outfits' | 'attractions' | 'transportation' | 'excursions' | 'restaurants' | 'api-test' | 'places-debug';
+export type TabType = 'dashboard' | 'destinations' | 'weather' | 'outfits' | 'attractions' | 'transportation' | 'excursions' | 'restaurants' | 'trips' | 'api-test' | 'places-debug';
 
 export interface AppState {
   currentTrip: Trip | null;

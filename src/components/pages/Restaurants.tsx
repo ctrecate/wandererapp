@@ -62,16 +62,31 @@ const Restaurants: React.FC = () => {
   }
 
   const toggleBookmark = (destinationId: string, restaurantId: string) => {
-    // Just update local state - no auto-saving to prevent flashing
+    if (!currentTrip) return
+
+    // Update local state
+    const updatedRestaurants = restaurants[destinationId]?.map(restaurant => {
+      if (restaurant.id === restaurantId) {
+        return { ...restaurant, isBookmarked: !restaurant.isBookmarked }
+      }
+      return restaurant
+    }) || []
+
     setRestaurants(prev => ({
       ...prev,
-      [destinationId]: prev[destinationId]?.map(restaurant => {
-        if (restaurant.id === restaurantId) {
-          return { ...restaurant, isBookmarked: !restaurant.isBookmarked }
-        }
-        return restaurant
-      }) || []
+      [destinationId]: updatedRestaurants
     }))
+
+    // Save to trip
+    const updatedDestinations = currentTrip.destinations.map(destination => {
+      if (destination.id === destinationId) {
+        return { ...destination, restaurants: updatedRestaurants }
+      }
+      return destination
+    })
+
+    const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+    saveTrip(updatedTrip)
   }
 
   const getPriceRangeDisplay = (priceRange: number) => {

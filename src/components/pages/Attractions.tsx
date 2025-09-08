@@ -57,21 +57,36 @@ const Attractions: React.FC = () => {
   }
 
   const toggleAttractionStatus = (destinationId: string, attractionId: string, status: 'isPlanned' | 'isCompleted') => {
-    // Just update local state - no auto-saving to prevent flashing
+    if (!currentTrip) return
+
+    // Update local state
+    const updatedAttractions = attractions[destinationId]?.map(attraction => {
+      if (attraction.id === attractionId) {
+        return {
+          ...attraction,
+          [status]: !attraction[status],
+          // If marking as completed, also mark as planned
+          ...(status === 'isCompleted' && !attraction.isCompleted ? { isPlanned: true } : {})
+        }
+      }
+      return attraction
+    }) || []
+
     setAttractions(prev => ({
       ...prev,
-      [destinationId]: prev[destinationId]?.map(attraction => {
-        if (attraction.id === attractionId) {
-          return {
-            ...attraction,
-            [status]: !attraction[status],
-            // If marking as completed, also mark as planned
-            ...(status === 'isCompleted' && !attraction.isCompleted ? { isPlanned: true } : {})
-          }
-        }
-        return attraction
-      }) || []
+      [destinationId]: updatedAttractions
     }))
+
+    // Save to trip
+    const updatedDestinations = currentTrip.destinations.map(destination => {
+      if (destination.id === destinationId) {
+        return { ...destination, attractions: updatedAttractions }
+      }
+      return destination
+    })
+
+    const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+    saveTrip(updatedTrip)
   }
 
   const getPriceRangeColor = (cost: string) => {

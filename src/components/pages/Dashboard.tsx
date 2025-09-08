@@ -1,11 +1,12 @@
 import React from 'react'
-import { MapPin, Calendar, Cloud, Camera, Bus, Utensils } from 'lucide-react'
+import { MapPin, Calendar, Cloud, Camera, Bus, Utensils, Plus } from 'lucide-react'
+import { Button } from '@/components/ui/Button'
 import { useApp } from '@/context/AppContext'
 import { formatDateRange, getDaysBetween } from '@/lib/utils'
 import type { Destination } from '@/types'
 
 const Dashboard: React.FC = () => {
-  const { currentTrip } = useApp()
+  const { currentTrip, setActiveTab } = useApp()
 
   if (!currentTrip) {
     return (
@@ -13,6 +14,12 @@ const Dashboard: React.FC = () => {
         <MapPin className="mx-auto h-12 w-12 text-gray-400" />
         <h3 className="mt-2 text-sm font-medium text-gray-900">No trip selected</h3>
         <p className="mt-1 text-sm text-gray-500">Create a new trip to get started.</p>
+        <div className="mt-6">
+          <Button onClick={() => setActiveTab('trips')} className="flex items-center space-x-2">
+            <Plus className="h-4 w-4" />
+            <span>View My Trips</span>
+          </Button>
+        </div>
       </div>
     )
   }

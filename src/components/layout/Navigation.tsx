@@ -7,7 +7,8 @@ import {
   Camera, 
   Bus, 
   Calendar, 
-  Utensils 
+  Utensils,
+  FolderOpen
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { useApp } from '@/context/AppContext'
@@ -16,8 +17,9 @@ import type { TabType } from '@/types'
 const Navigation: React.FC = () => {
   const { activeTab, setActiveTab, currentTrip } = useApp()
 
-  const tabs = [
+  const allTabs = [
     { id: 'dashboard' as TabType, label: 'Dashboard', icon: LayoutDashboard },
+    { id: 'trips' as TabType, label: 'My Trips', icon: FolderOpen },
     { id: 'destinations' as TabType, label: 'Destinations', icon: MapPin },
     { id: 'weather' as TabType, label: 'Weather', icon: Cloud },
     { id: 'outfits' as TabType, label: 'Outfits', icon: Shirt },
@@ -29,7 +31,10 @@ const Navigation: React.FC = () => {
     { id: 'places-debug' as TabType, label: 'Places Debug', icon: Camera },
   ]
 
-  if (!currentTrip) return null
+  // Show different tabs based on whether there's a current trip
+  const tabs = currentTrip 
+    ? allTabs.filter(tab => tab.id !== 'trips') // Hide trips tab when viewing a specific trip
+    : [{ id: 'trips' as TabType, label: 'My Trips', icon: FolderOpen }] // Only show trips tab when no trip selected
 
   return (
     <nav className="bg-white border-b border-gray-200">
