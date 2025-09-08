@@ -45,20 +45,26 @@ const PlaceAutocomplete: React.FC<PlaceAutocompleteProps> = ({
 
     const timeoutId = setTimeout(async () => {
       setIsLoading(true)
+      console.log('🔍 Autocomplete: Searching for:', value)
       try {
         const response = await fetch(`/api/places/autocomplete?input=${encodeURIComponent(value)}`)
+        console.log('📡 Autocomplete: Response status:', response.status)
+        
         const data = await response.json()
+        console.log('📊 Autocomplete: Response data:', data)
         
         if (data.predictions && data.predictions.length > 0) {
+          console.log(`✅ Autocomplete: Found ${data.predictions.length} predictions`)
           setPredictions(data.predictions)
           setIsOpen(true)
           setSelectedIndex(-1)
         } else {
+          console.log('❌ Autocomplete: No predictions found')
           setPredictions([])
           setIsOpen(false)
         }
       } catch (error) {
-        console.error('Error fetching autocomplete:', error)
+        console.error('💥 Autocomplete: Error fetching autocomplete:', error)
         setPredictions([])
         setIsOpen(false)
       } finally {

@@ -40,6 +40,22 @@ const DestinationForm: React.FC<DestinationFormProps> = ({
     }))
   }
 
+  const handlePlaceInputChange = (value: string) => {
+    setPlaceInput(value)
+    
+    // If user is typing manually, try to extract city and country
+    if (value.includes(',')) {
+      const parts = value.split(',').map(part => part.trim())
+      if (parts.length >= 2) {
+        setFormData(prev => ({
+          ...prev,
+          city: parts[0],
+          country: parts[parts.length - 1]
+        }))
+      }
+    }
+  }
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {}
 
@@ -120,7 +136,7 @@ const DestinationForm: React.FC<DestinationFormProps> = ({
           </label>
           <PlaceAutocomplete
             value={placeInput}
-            onChange={setPlaceInput}
+            onChange={handlePlaceInputChange}
             onSelect={handlePlaceSelect}
             placeholder="Start typing a city name..."
             className={errors.city || errors.country ? 'border-red-500' : ''}
