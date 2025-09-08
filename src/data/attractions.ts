@@ -145,5 +145,53 @@ export const attractionsData: Record<string, Attraction[]> = {
 
 export function getAttractionsForCity(city: string): Attraction[] {
   const cityKey = city.toLowerCase().replace(/\s+/g, '-')
-  return attractionsData[cityKey] || []
+  
+  // Try exact match first
+  if (attractionsData[cityKey]) {
+    return attractionsData[cityKey]
+  }
+  
+  // Try partial matches for common city names
+  const cityLower = city.toLowerCase()
+  
+  if (cityLower.includes('paris')) {
+    return attractionsData['paris'] || []
+  }
+  if (cityLower.includes('london')) {
+    return attractionsData['london'] || []
+  }
+  if (cityLower.includes('tokyo')) {
+    return attractionsData['tokyo'] || []
+  }
+  if (cityLower.includes('new york') || cityLower.includes('nyc')) {
+    return attractionsData['new-york'] || []
+  }
+  
+  // Return some sample attractions for any other city
+  return [
+    {
+      id: 'sample-attraction-1',
+      name: 'City Center Plaza',
+      description: 'The heart of the city with beautiful architecture and local culture.',
+      category: 'Landmark',
+      openingHours: '24/7',
+      cost: 'Free',
+      duration: '1-2 hours',
+      howToGetThere: 'Located in the city center, accessible by public transport',
+      rating: 4.3,
+      imageUrl: 'https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=400'
+    },
+    {
+      id: 'sample-attraction-2',
+      name: 'Local History Museum',
+      description: 'Discover the rich history and culture of the region.',
+      category: 'Museum',
+      openingHours: '10:00 AM - 6:00 PM (closed Mondays)',
+      cost: '$10-15',
+      duration: '2-3 hours',
+      howToGetThere: 'Metro: City Center Station, Bus: Route 5',
+      rating: 4.1,
+      imageUrl: 'https://images.unsplash.com/photo-1541961017774-22349e4a1262?w=400'
+    }
+  ]
 }

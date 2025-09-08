@@ -121,5 +121,53 @@ export const restaurantsData: Record<string, Restaurant[]> = {
 
 export function getRestaurantsForCity(city: string): Restaurant[] {
   const cityKey = city.toLowerCase().replace(/\s+/g, '-')
-  return restaurantsData[cityKey] || []
+  
+  // Try exact match first
+  if (restaurantsData[cityKey]) {
+    return restaurantsData[cityKey]
+  }
+  
+  // Try partial matches for common city names
+  const cityLower = city.toLowerCase()
+  
+  if (cityLower.includes('paris')) {
+    return restaurantsData['paris'] || []
+  }
+  if (cityLower.includes('london')) {
+    return restaurantsData['london'] || []
+  }
+  if (cityLower.includes('tokyo')) {
+    return restaurantsData['tokyo'] || []
+  }
+  if (cityLower.includes('new york') || cityLower.includes('nyc')) {
+    return restaurantsData['new-york'] || []
+  }
+  
+  // Return some sample restaurants for any other city
+  return [
+    {
+      id: 'sample-restaurant-1',
+      name: 'Local Cuisine Restaurant',
+      cuisine: 'Local',
+      priceRange: 2,
+      rating: 4.2,
+      mustTryDishes: ['Local specialty', 'Traditional dish', 'Regional favorite'],
+      address: 'Main Street, City Center',
+      phone: '+1 (555) 123-4567',
+      openingHours: '11:00 AM - 10:00 PM',
+      isBookmarked: false
+    },
+    {
+      id: 'sample-restaurant-2',
+      name: 'International Bistro',
+      cuisine: 'International',
+      priceRange: 3,
+      rating: 4.4,
+      mustTryDishes: ['Chef\'s special', 'Signature dish', 'Popular choice'],
+      address: 'Downtown District',
+      phone: '+1 (555) 987-6543',
+      openingHours: '12:00 PM - 11:00 PM',
+      isBookmarked: false
+    }
+  ]
 }

@@ -10,6 +10,7 @@ import { Weather } from '@/components/pages/Weather'
 import { Attractions } from '@/components/pages/Attractions'
 import { Restaurants } from '@/components/pages/Restaurants'
 import { Outfits } from '@/components/pages/Outfits'
+import { Transportation } from '@/components/pages/Transportation'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 function AppContent() {
@@ -52,7 +53,7 @@ function AppContent() {
       case 'attractions':
         return <Attractions />
       case 'transportation':
-        return <div className="text-center py-12"><p className="text-gray-500">Transportation info coming soon...</p></div>
+        return <Transportation />
       case 'excursions':
         return <div className="text-center py-12"><p className="text-gray-500">Custom excursions coming soon...</p></div>
       case 'restaurants':

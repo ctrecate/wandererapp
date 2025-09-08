@@ -11,10 +11,6 @@ const config: Config = {
       colors: {
         primary: '#3B82F6',
         secondary: '#10B981',
-        background: '#F9FAFB',
-        text: '#374151',
-        success: '#059669',
-        warning: '#D97706',
       },
       backgroundImage: {
         'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
