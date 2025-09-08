@@ -5,6 +5,7 @@ import { fetchWeatherForecast } from '@/services/weather'
 import type { Weather } from '@/types'
 import { formatDate, formatTemperature, getWeatherIcon } from '@/lib/utils'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
+import { Button } from '@/components/ui/Button'
 
 const Weather: React.FC = () => {
   const { currentTrip } = useApp()
@@ -18,21 +19,23 @@ const Weather: React.FC = () => {
     }
   }, [currentTrip?.destinations])
 
-  const loadWeatherForAllDestinations = async () => {
+  const loadWeatherForAllDestinations = async (forceRefresh = false) => {
     if (!currentTrip) return
 
     for (const destination of currentTrip.destinations) {
-      await loadWeatherForDestination(destination)
+      await loadWeatherForDestination(destination, forceRefresh)
     }
   }
 
-  const loadWeatherForDestination = async (destination: { city: string; country: string; id: string }) => {
+  const loadWeatherForDestination = async (destination: { city: string; country: string; id: string }, forceRefresh = false) => {
     setLoading(prev => ({ ...prev, [destination.id]: true }))
     setError(null)
 
     try {
+      console.log(`🌤️ Loading weather for ${destination.city}, ${destination.country}`)
       const weather = await fetchWeatherForecast(destination.city, destination.country)
       setWeatherData(prev => ({ ...prev, [destination.id]: weather }))
+      console.log(`✅ Weather loaded for ${destination.city}:`, weather.length, 'days')
     } catch (err) {
       setError('Failed to load weather data')
       console.error('Weather fetch error:', err)
@@ -83,9 +86,19 @@ const Weather: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Weather Forecast</h1>
-        <p className="text-gray-600">7-day weather forecast for your destinations</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Weather Forecast</h1>
+          <p className="text-gray-600">7-day weather forecast for your destinations</p>
+        </div>
+        <Button 
+          onClick={() => loadWeatherForAllDestinations(true)}
+          variant="outline"
+          className="flex items-center space-x-2"
+        >
+          <span>🔄</span>
+          <span>Force Refresh Weather</span>
+        </Button>
       </div>
 
       {error && (

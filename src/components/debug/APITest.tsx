@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { fetchRestaurantsFromAPI, fetchAttractionsFromAPI } from '@/services/places'
+import { fetchWeatherForecast } from '@/services/weather'
 
 const APITest: React.FC = () => {
   const [testResults, setTestResults] = useState<string[]>([])
@@ -14,29 +15,58 @@ const APITest: React.FC = () => {
     
     try {
       // Test restaurants
-      results.push('Testing Google Places API...')
-      results.push('API Key: AIzaSyA_s8qPRrFrKfAvAU_N-CmIumtmDTHUmik')
+      results.push('🧪 Testing Google Places API...')
+      results.push('🔑 API Key: AIzaSyA_s8qPRrFrKfAvAU_N-CmIumtmDTHUmik')
+      results.push('')
       
+      results.push('🍽️ Testing Restaurants for Barcelona, Spain:')
       const restaurants = await fetchRestaurantsFromAPI('Barcelona', 'Spain')
-      results.push(`Restaurants found: ${restaurants.length}`)
+      results.push(`✅ Restaurants found: ${restaurants.length}`)
       
       if (restaurants.length > 0) {
-        results.push(`First restaurant: ${restaurants[0].name}`)
-        results.push(`Rating: ${restaurants[0].rating}`)
-        results.push(`Address: ${restaurants[0].address}`)
+        results.push(`📍 First restaurant: ${restaurants[0].name}`)
+        results.push(`⭐ Rating: ${restaurants[0].rating}`)
+        results.push(`🏠 Address: ${restaurants[0].address}`)
+        results.push(`🍴 Cuisine: ${restaurants[0].cuisine}`)
+        results.push(`💰 Price Range: ${restaurants[0].priceRange}/4`)
       }
       
-      // Test attractions
+      results.push('')
+      results.push('🏛️ Testing Attractions for Barcelona, Spain:')
       const attractions = await fetchAttractionsFromAPI('Barcelona', 'Spain')
-      results.push(`Attractions found: ${attractions.length}`)
+      results.push(`✅ Attractions found: ${attractions.length}`)
       
       if (attractions.length > 0) {
-        results.push(`First attraction: ${attractions[0].name}`)
-        results.push(`Rating: ${attractions[0].rating}`)
+        results.push(`📍 First attraction: ${attractions[0].name}`)
+        results.push(`⭐ Rating: ${attractions[0].rating}`)
+        results.push(`🏷️ Category: ${attractions[0].category}`)
+        results.push(`💰 Cost: ${attractions[0].cost}`)
+      }
+      
+      results.push('')
+      results.push('🎯 Testing Tokyo, Japan:')
+      const tokyoRestaurants = await fetchRestaurantsFromAPI('Tokyo', 'Japan')
+      results.push(`🍽️ Tokyo restaurants: ${tokyoRestaurants.length}`)
+      
+      if (tokyoRestaurants.length > 0) {
+        results.push(`📍 First Tokyo restaurant: ${tokyoRestaurants[0].name}`)
+        results.push(`🍴 Cuisine: ${tokyoRestaurants[0].cuisine}`)
+      }
+      
+      results.push('')
+      results.push('🌤️ Testing Weather for Barcelona, Spain:')
+      const weather = await fetchWeatherForecast('Barcelona', 'Spain')
+      results.push(`🌡️ Weather forecast: ${weather.length} days`)
+      
+      if (weather.length > 0) {
+        results.push(`📅 Today: ${weather[0].temperature.high}°C/${weather[0].temperature.low}°C`)
+        results.push(`☁️ Condition: ${weather[0].condition}`)
+        results.push(`💧 Humidity: ${weather[0].humidity}%`)
+        results.push(`🌬️ Wind: ${weather[0].windSpeed} km/h`)
       }
       
     } catch (error) {
-      results.push(`Error: ${error}`)
+      results.push(`❌ Error: ${error}`)
     }
     
     setTestResults(results)
