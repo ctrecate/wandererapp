@@ -76,25 +76,15 @@ const PlacesDebugger: React.FC = () => {
       }
       results.push('')
       
-      // Test 5: Test direct Google Places API call
-      results.push('🌐 TEST 5: Testing Direct Google Places API Call')
+      // Test 5: Test Google Places API Key
+      results.push('🧪 TEST 5: Testing Google Places API Key')
       try {
-        const apiKey = 'AIzaSyA_s8qPRrFrKfAvAU_N-CmIumtmDTHUmik'
-        const directUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+${encodeURIComponent(testCity)},+${encodeURIComponent(testCountry)}&type=restaurant&key=${apiKey}`
-        results.push(`🔗 Direct API URL: ${directUrl}`)
-        
-        const directResponse = await fetch(directUrl)
-        results.push(`📡 Direct API status: ${directResponse.status} ${directResponse.statusText}`)
-        
-        if (directResponse.ok) {
-          const directData = await directResponse.json()
-          results.push(`📊 Direct API response: ${JSON.stringify(directData, null, 2)}`)
-        } else {
-          const errorText = await directResponse.text()
-          results.push(`❌ Direct API error: ${errorText}`)
-        }
+        const testResponse = await fetch('/api/places/test')
+        const testData = await testResponse.json()
+        results.push(`📡 API Key test status: ${testResponse.status}`)
+        results.push(`📊 API Key test result: ${JSON.stringify(testData, null, 2)}`)
       } catch (error) {
-        results.push(`❌ Direct API error: ${error}`)
+        results.push(`❌ API Key test error: ${error}`)
       }
       results.push('')
       

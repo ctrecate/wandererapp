@@ -28,16 +28,28 @@ export async function GET(request: NextRequest) {
       console.log('🌐 Server: Trying URL:', url)
       
       try {
-        const response = await fetch(url)
-        console.log('📡 Server: Response status:', response.status)
+        const response = await fetch(url, {
+          method: 'GET',
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (compatible; TravelApp/1.0)',
+          },
+        })
+        console.log('📡 Server: Response status:', response.status, response.statusText)
 
         if (!response.ok) {
-          console.log('❌ Server: HTTP Error:', response.status)
+          console.log('❌ Server: HTTP Error:', response.status, response.statusText)
+          const errorText = await response.text()
+          console.log('❌ Error details:', errorText)
           continue
         }
 
         const data = await response.json()
-        console.log('📊 Server: API response:', data.status, data.results?.length, 'results')
+        console.log('📊 Server: API response status:', data.status)
+        console.log('📊 Server: API response results count:', data.results?.length || 0)
+        if (data.error_message) {
+          console.log('❌ Google API Error:', data.error_message)
+        }
 
         if (data.status === 'OK' && data.results && data.results.length > 0) {
           console.log(`✅ Server: Found ${data.results.length} restaurants`)
