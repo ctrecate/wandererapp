@@ -58,20 +58,65 @@ export async function GET(request: NextRequest) {
         if (data.places && data.places.length > 0) {
           console.log(`✅ Server: Found ${data.places.length} restaurants`)
           
-          const restaurants = data.places.slice(0, 10).map((place: any) => ({
-            id: place.id || `restaurant_${Math.random().toString(36).substr(2, 9)}`,
-            name: place.displayName?.text || 'Restaurant',
-            cuisine: getCuisineFromTypes(place.types),
-            priceRange: place.priceLevel ? place.priceLevel + 1 : 2,
-            rating: place.rating || 4.0,
-            mustTryDishes: getDefaultDishesForCuisine(getCuisineFromTypes(place.types)),
-            address: place.formattedAddress || `${city}, ${country}`,
-            phone: place.nationalPhoneNumber || undefined,
-            website: place.websiteUri || undefined,
-            openingHours: 'Hours not available', // Not available in new API without additional call
-            isBookmarked: false,
-            photoUrl: place.photos?.[0] ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` : undefined
-          }))
+          // Get detailed information for each place
+          const restaurants = await Promise.all(
+            data.places.slice(0, 10).map(async (place: any) => {
+              let detailedInfo = {
+                website: undefined,
+                phone: undefined,
+                openingHours: 'Hours not available'
+              }
+
+              // Get detailed place information
+              try {
+                const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}?fields=websiteUri,nationalPhoneNumber,regularOpeningHours&key=${GOOGLE_PLACES_API_KEY}`
+                console.log('🔍 Server: Fetching details for place:', place.id)
+                console.log('🔍 Server: Details URL:', detailsUrl)
+                
+                const detailsResponse = await fetch(detailsUrl, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+
+                console.log('📡 Server: Details response status:', detailsResponse.status, detailsResponse.statusText)
+
+                if (detailsResponse.ok) {
+                  const detailsData = await detailsResponse.json()
+                  console.log('📊 Server: Details data for', place.displayName?.text, ':', detailsData)
+                  
+                  detailedInfo = {
+                    website: detailsData.websiteUri || undefined,
+                    phone: detailsData.nationalPhoneNumber || undefined,
+                    openingHours: detailsData.regularOpeningHours?.weekdayDescriptions?.join(', ') || 'Hours not available'
+                  }
+                  
+                  console.log('✅ Server: Extracted info for', place.displayName?.text, ':', detailedInfo)
+                } else {
+                  const errorText = await detailsResponse.text()
+                  console.log('❌ Server: Details API error:', detailsResponse.status, errorText)
+                }
+              } catch (error) {
+                console.log('⚠️ Server: Could not fetch detailed info for place:', place.id, error)
+              }
+
+              return {
+                id: place.id || `restaurant_${Math.random().toString(36).substr(2, 9)}`,
+                name: place.displayName?.text || 'Restaurant',
+                cuisine: getCuisineFromTypes(place.types),
+                priceRange: place.priceLevel ? place.priceLevel + 1 : 2,
+                rating: place.rating || 4.0,
+                mustTryDishes: getDefaultDishesForCuisine(getCuisineFromTypes(place.types)),
+                address: place.formattedAddress || `${city}, ${country}`,
+                phone: detailedInfo.phone,
+                website: detailedInfo.website,
+                openingHours: detailedInfo.openingHours,
+                isBookmarked: false,
+                photoUrl: place.photos?.[0] ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` : undefined
+              }
+            })
+          )
 
           return NextResponse.json({ restaurants, source: 'google_places_api' })
         } else {

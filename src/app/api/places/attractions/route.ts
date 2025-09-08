@@ -58,21 +58,64 @@ export async function GET(request: NextRequest) {
         if (data.places && data.places.length > 0) {
           console.log(`✅ Server: Found ${data.places.length} attractions`)
           
-          const attractions = data.places.slice(0, 10).map((place: any) => ({
-            id: place.id || `attraction_${Math.random().toString(36).substr(2, 9)}`,
-            name: place.displayName?.text || 'Tourist Attraction',
-            description: place.editorialSummary?.text || `Popular tourist attraction in ${city}`,
-            category: getCategoryFromTypes(place.types),
-            openingHours: 'Hours vary', // Not available in new API without additional call
-            cost: 'Varies',
-            duration: '1-3 hours',
-            howToGetThere: `Located at ${place.formattedAddress || city}`,
-            rating: place.rating || 4.0,
-            website: place.websiteUri || undefined,
-            imageUrl: place.photos?.[0] ? 
-              `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` :
-              undefined
-          }))
+          // Get detailed information for each place
+          const attractions = await Promise.all(
+            data.places.slice(0, 10).map(async (place: any) => {
+              let detailedInfo = {
+                website: undefined,
+                openingHours: 'Hours vary'
+              }
+
+              // Get detailed place information
+              try {
+                const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}?fields=websiteUri,regularOpeningHours&key=${GOOGLE_PLACES_API_KEY}`
+                console.log('🔍 Server: Fetching attraction details for place:', place.id)
+                console.log('🔍 Server: Attraction details URL:', detailsUrl)
+                
+                const detailsResponse = await fetch(detailsUrl, {
+                  method: 'GET',
+                  headers: {
+                    'Content-Type': 'application/json',
+                  },
+                })
+
+                console.log('📡 Server: Attraction details response status:', detailsResponse.status, detailsResponse.statusText)
+
+                if (detailsResponse.ok) {
+                  const detailsData = await detailsResponse.json()
+                  console.log('📊 Server: Attraction details data for', place.displayName?.text, ':', detailsData)
+                  
+                  detailedInfo = {
+                    website: detailsData.websiteUri || undefined,
+                    openingHours: detailsData.regularOpeningHours?.weekdayDescriptions?.join(', ') || 'Hours vary'
+                  }
+                  
+                  console.log('✅ Server: Extracted attraction info for', place.displayName?.text, ':', detailedInfo)
+                } else {
+                  const errorText = await detailsResponse.text()
+                  console.log('❌ Server: Attraction details API error:', detailsResponse.status, errorText)
+                }
+              } catch (error) {
+                console.log('⚠️ Server: Could not fetch detailed info for attraction:', place.id, error)
+              }
+
+              return {
+                id: place.id || `attraction_${Math.random().toString(36).substr(2, 9)}`,
+                name: place.displayName?.text || 'Tourist Attraction',
+                description: place.editorialSummary?.text || `Popular tourist attraction in ${city}`,
+                category: getCategoryFromTypes(place.types),
+                openingHours: detailedInfo.openingHours,
+                cost: 'Varies',
+                duration: '1-3 hours',
+                howToGetThere: `Located at ${place.formattedAddress || city}`,
+                rating: place.rating || 4.0,
+                website: detailedInfo.website,
+                imageUrl: place.photos?.[0] ? 
+                  `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` :
+                  undefined
+              }
+            })
+          )
 
           return NextResponse.json({ attractions, source: 'google_places_api' })
         } else {

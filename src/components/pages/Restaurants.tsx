@@ -402,6 +402,12 @@ const Restaurants: React.FC = () => {
                               <span>Website</span>
                             </Button>
                           )}
+                          {/* Debug info - remove this later */}
+                          {process.env.NODE_ENV === 'development' && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              Debug: website={restaurant.website ? 'YES' : 'NO'}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>

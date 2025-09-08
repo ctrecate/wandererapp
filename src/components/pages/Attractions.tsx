@@ -337,6 +337,12 @@ const Attractions: React.FC = () => {
                               <span>Website</span>
                             </Button>
                           )}
+                          {/* Debug info - remove this later */}
+                          {process.env.NODE_ENV === 'development' && (
+                            <div className="text-xs text-gray-400 mt-1">
+                              Debug: website={attraction.website ? 'YES' : 'NO'}
+                            </div>
+                          )}
                         </div>
                       </div>
                     </div>
