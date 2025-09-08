@@ -6,17 +6,24 @@ export async function GET(request: NextRequest) {
   try {
     console.log('🧪 Testing Google Places API Key')
     
-    // Test with a simple, well-known location
-    const testUrl = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=restaurants+in+New+York&type=restaurant&key=${GOOGLE_PLACES_API_KEY}`
+    // Test with the new Places API
+    const testUrl = `https://places.googleapis.com/v1/places:searchText`
     
     console.log('🌐 Test URL:', testUrl)
     
     const response = await fetch(testUrl, {
-      method: 'GET',
+      method: 'POST',
       headers: {
-        'Accept': 'application/json',
-        'User-Agent': 'Mozilla/5.0 (compatible; TravelApp/1.0)',
+        'Content-Type': 'application/json',
+        'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+        'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.types',
       },
+      body: JSON.stringify({
+        textQuery: 'restaurants in New York',
+        maxResultCount: 5,
+        includedType: 'restaurant',
+        languageCode: 'en'
+      }),
     })
     
     console.log('📡 Test response status:', response.status, response.statusText)
@@ -36,10 +43,8 @@ export async function GET(request: NextRequest) {
     
     return NextResponse.json({
       success: true,
-      status: data.status,
-      resultsCount: data.results?.length || 0,
-      errorMessage: data.error_message,
-      firstResult: data.results?.[0] || null,
+      placesCount: data.places?.length || 0,
+      firstPlace: data.places?.[0] || null,
       fullResponse: data
     })
     

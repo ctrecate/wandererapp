@@ -13,64 +13,14 @@ export async function GET(request: NextRequest) {
 
     console.log('🔍 Server: Autocomplete search for:', input)
 
-    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(input)}&types=(cities)&key=${GOOGLE_PLACES_API_KEY}`
+    // For now, let's use the fallback cities approach since the new autocomplete API is complex
+    // We'll focus on getting restaurants and attractions working first
+    console.log('🔍 Server: Using fallback cities for autocomplete')
     
-    console.log('🌐 Server: Autocomplete URL:', url)
+    const fallbackCities = getFallbackCities(input)
+    console.log('📊 Server: Fallback cities found:', fallbackCities.length)
     
-    const response = await fetch(url)
-    console.log('📡 Server: Autocomplete response status:', response.status)
-
-    if (!response.ok) {
-      console.error('❌ Server: Autocomplete API error:', response.status)
-      return NextResponse.json({ predictions: [] })
-    }
-
-    const data = await response.json()
-    console.log('📊 Server: Autocomplete response:', data)
-
-    if (data.status === 'OK' && data.predictions) {
-      // Process predictions to extract city and country
-      const processedPredictions = data.predictions.map((prediction: any) => {
-        const description = prediction.description
-        const parts = description.split(', ')
-        
-        // Extract city and country from the description
-        let city = parts[0]
-        let country = parts[parts.length - 1]
-        
-        // Handle cases where country might be a state/province
-        if (parts.length > 2) {
-          // Check if the last part is a country or state
-          const lastPart = parts[parts.length - 1]
-          const secondLastPart = parts[parts.length - 2]
-          
-          // If last part looks like a country (2-3 letters or common country names)
-          if (lastPart.length <= 3 || isCommonCountry(lastPart)) {
-            country = lastPart
-          } else {
-            country = secondLastPart
-          }
-        }
-        
-        return {
-          place_id: prediction.place_id,
-          description: prediction.description,
-          city: city,
-          country: country,
-          structured_formatting: prediction.structured_formatting
-        }
-      })
-
-      console.log(`✅ Server: Found ${processedPredictions.length} autocomplete suggestions`)
-      return NextResponse.json({ predictions: processedPredictions })
-    } else {
-      console.log('⚠️ Server: No autocomplete results, status:', data.status, 'Error:', data.error_message)
-      
-      // Fallback: return some common cities if API fails
-      const fallbackCities = getFallbackCities(input)
-      console.log(`🔄 Server: Using fallback cities: ${fallbackCities.length} suggestions`)
-      return NextResponse.json({ predictions: fallbackCities })
-    }
+    return NextResponse.json({ predictions: fallbackCities })
 
   } catch (error) {
     console.error('💥 Server: Error in autocomplete API:', error)

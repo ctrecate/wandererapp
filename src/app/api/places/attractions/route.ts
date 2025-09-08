@@ -23,17 +23,24 @@ export async function GET(request: NextRequest) {
     ]
 
     for (const query of queries) {
-      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&type=tourist_attraction&key=${GOOGLE_PLACES_API_KEY}`
+      const url = `https://places.googleapis.com/v1/places:searchText`
       
       console.log('🌐 Server: Trying attractions URL:', url)
       
       try {
         const response = await fetch(url, {
-          method: 'GET',
+          method: 'POST',
           headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (compatible; TravelApp/1.0)',
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.types,places.location,places.photos,places.websiteUri,places.editorialSummary',
           },
+          body: JSON.stringify({
+            textQuery: query,
+            maxResultCount: 10,
+            includedType: 'tourist_attraction',
+            languageCode: 'en'
+          }),
         })
         console.log('📡 Server: Attractions response status:', response.status, response.statusText)
 
@@ -45,27 +52,24 @@ export async function GET(request: NextRequest) {
         }
 
         const data = await response.json()
-        console.log('📊 Server: Attractions API response status:', data.status)
-        console.log('📊 Server: Attractions API response results count:', data.results?.length || 0)
-        if (data.error_message) {
-          console.log('❌ Google Attractions API Error:', data.error_message)
-        }
+        console.log('📊 Server: Attractions API response data:', data)
+        console.log('📊 Server: Attractions API response places count:', data.places?.length || 0)
 
-        if (data.status === 'OK' && data.results && data.results.length > 0) {
-          console.log(`✅ Server: Found ${data.results.length} attractions`)
+        if (data.places && data.places.length > 0) {
+          console.log(`✅ Server: Found ${data.places.length} attractions`)
           
-          const attractions = data.results.slice(0, 10).map((place: any) => ({
-            id: place.place_id,
-            name: place.name,
-            description: `Popular tourist attraction in ${city}`,
+          const attractions = data.places.slice(0, 10).map((place: any) => ({
+            id: place.id || `attraction_${Math.random().toString(36).substr(2, 9)}`,
+            name: place.displayName?.text || 'Tourist Attraction',
+            description: place.editorialSummary?.text || `Popular tourist attraction in ${city}`,
             category: getCategoryFromTypes(place.types),
-            openingHours: place.opening_hours?.weekday_text?.join(', ') || 'Hours vary',
+            openingHours: 'Hours vary', // Not available in new API without additional call
             cost: 'Varies',
             duration: '1-3 hours',
-            howToGetThere: `Located at ${place.vicinity}`,
+            howToGetThere: `Located at ${place.formattedAddress || city}`,
             rating: place.rating || 4.0,
             imageUrl: place.photos?.[0] ? 
-              `https://maps.googleapis.com/maps/api/place/photo?maxwidth=400&photoreference=${place.photos[0].photo_reference}&key=${GOOGLE_PLACES_API_KEY}` :
+              `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` :
               undefined
           }))
 

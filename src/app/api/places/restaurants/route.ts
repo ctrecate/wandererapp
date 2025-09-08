@@ -23,17 +23,24 @@ export async function GET(request: NextRequest) {
     ]
 
     for (const query of queries) {
-      const url = `https://maps.googleapis.com/maps/api/place/textsearch/json?query=${encodeURIComponent(query)}&type=restaurant&key=${GOOGLE_PLACES_API_KEY}`
+      const url = `https://places.googleapis.com/v1/places:searchText`
       
       console.log('🌐 Server: Trying URL:', url)
       
       try {
         const response = await fetch(url, {
-          method: 'GET',
+          method: 'POST',
           headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (compatible; TravelApp/1.0)',
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.types,places.location,places.photos,places.websiteUri,places.editorialSummary',
           },
+          body: JSON.stringify({
+            textQuery: query,
+            maxResultCount: 10,
+            includedType: 'restaurant',
+            languageCode: 'en'
+          }),
         })
         console.log('📡 Server: Response status:', response.status, response.statusText)
 
@@ -45,25 +52,22 @@ export async function GET(request: NextRequest) {
         }
 
         const data = await response.json()
-        console.log('📊 Server: API response status:', data.status)
-        console.log('📊 Server: API response results count:', data.results?.length || 0)
-        if (data.error_message) {
-          console.log('❌ Google API Error:', data.error_message)
-        }
+        console.log('📊 Server: API response data:', data)
+        console.log('📊 Server: API response places count:', data.places?.length || 0)
 
-        if (data.status === 'OK' && data.results && data.results.length > 0) {
-          console.log(`✅ Server: Found ${data.results.length} restaurants`)
+        if (data.places && data.places.length > 0) {
+          console.log(`✅ Server: Found ${data.places.length} restaurants`)
           
-          const restaurants = data.results.slice(0, 10).map((place: any) => ({
-            id: place.place_id,
-            name: place.name,
+          const restaurants = data.places.slice(0, 10).map((place: any) => ({
+            id: place.id || `restaurant_${Math.random().toString(36).substr(2, 9)}`,
+            name: place.displayName?.text || 'Restaurant',
             cuisine: getCuisineFromTypes(place.types),
-            priceRange: place.price_level ? place.price_level + 1 : 2,
+            priceRange: place.priceLevel ? place.priceLevel + 1 : 2,
             rating: place.rating || 4.0,
             mustTryDishes: getDefaultDishesForCuisine(getCuisineFromTypes(place.types)),
-            address: place.formatted_address || place.vicinity,
+            address: place.formattedAddress || `${city}, ${country}`,
             phone: undefined,
-            openingHours: place.opening_hours?.weekday_text?.join(', ') || 'Hours not available',
+            openingHours: 'Hours not available', // Not available in new API without additional call
             isBookmarked: false
           }))
 
