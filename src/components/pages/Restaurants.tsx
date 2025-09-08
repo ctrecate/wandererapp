@@ -27,10 +27,19 @@ const Restaurants: React.FC = () => {
     if (!currentTrip) return
 
     const newRestaurants: Record<string, Restaurant[]> = {}
+    let shouldSaveTrip = false
     
     for (const destination of currentTrip.destinations) {
       try {
         console.log(`Loading restaurants for ${destination.city}, ${destination.country}`)
+        
+        // Check if we already have restaurants for this destination and don't need to force refresh
+        const existingRestaurants = destination.restaurants || []
+        if (existingRestaurants.length > 0 && !forceAPI) {
+          console.log(`Using existing restaurants for ${destination.city}`)
+          newRestaurants[destination.id] = existingRestaurants
+          continue
+        }
         
         // Always try API first if forceAPI is true, otherwise try API then fallback
         let cityRestaurants = await fetchRestaurantsFromAPI(destination.city, destination.country)
@@ -43,23 +52,14 @@ const Restaurants: React.FC = () => {
         }
         
         // Merge with existing restaurants from the destination
-        const existingRestaurants = destination.restaurants || []
         const mergedRestaurants = cityRestaurants.map(restaurant => {
           const existing = existingRestaurants.find(existing => existing.id === restaurant.id)
           return existing ? { ...restaurant, ...existing } : restaurant
         })
         newRestaurants[destination.id] = mergedRestaurants
         
-        // Save the fetched restaurants to the trip destination
-        const updatedDestinations = currentTrip.destinations.map(dest => {
-          if (dest.id === destination.id) {
-            return { ...dest, restaurants: mergedRestaurants }
-          }
-          return dest
-        })
-        
-        const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
-        saveTrip(updatedTrip)
+        // Mark that we need to save the trip (only if we fetched new data)
+        shouldSaveTrip = true
         
       } catch (error) {
         console.error('Error loading restaurants for', destination.city, error)
@@ -69,6 +69,19 @@ const Restaurants: React.FC = () => {
     }
 
     setRestaurants(newRestaurants)
+    
+    // Only save the trip if we actually fetched new data
+    if (shouldSaveTrip) {
+      const updatedDestinations = currentTrip.destinations.map(dest => {
+        if (newRestaurants[dest.id]) {
+          return { ...dest, restaurants: newRestaurants[dest.id] }
+        }
+        return dest
+      })
+      
+      const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+      saveTrip(updatedTrip)
+    }
   }
 
   const toggleBookmark = (destinationId: string, restaurantId: string) => {

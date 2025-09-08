@@ -22,10 +22,19 @@ const Attractions: React.FC = () => {
     if (!currentTrip) return
 
     const newAttractions: Record<string, Attraction[]> = {}
+    let shouldSaveTrip = false
     
     for (const destination of currentTrip.destinations) {
       try {
         console.log(`Loading attractions for ${destination.city}, ${destination.country}`)
+        
+        // Check if we already have attractions for this destination and don't need to force refresh
+        const existingAttractions = destination.attractions || []
+        if (existingAttractions.length > 0 && !forceAPI) {
+          console.log(`Using existing attractions for ${destination.city}`)
+          newAttractions[destination.id] = existingAttractions
+          continue
+        }
         
         // Always try API first if forceAPI is true, otherwise try API then fallback
         let cityAttractions = await fetchAttractionsFromAPI(destination.city, destination.country)
@@ -38,23 +47,14 @@ const Attractions: React.FC = () => {
         }
         
         // Merge with existing attractions from the destination
-        const existingAttractions = destination.attractions || []
         const mergedAttractions = cityAttractions.map(attraction => {
           const existing = existingAttractions.find(existing => existing.id === attraction.id)
           return existing ? { ...attraction, ...existing } : attraction
         })
         newAttractions[destination.id] = mergedAttractions
         
-        // Save the fetched attractions to the trip destination
-        const updatedDestinations = currentTrip.destinations.map(dest => {
-          if (dest.id === destination.id) {
-            return { ...dest, attractions: mergedAttractions }
-          }
-          return dest
-        })
-        
-        const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
-        saveTrip(updatedTrip)
+        // Mark that we need to save the trip (only if we fetched new data)
+        shouldSaveTrip = true
         
       } catch (error) {
         console.error('Error loading attractions for', destination.city, error)
@@ -64,6 +64,19 @@ const Attractions: React.FC = () => {
     }
 
     setAttractions(newAttractions)
+    
+    // Only save the trip if we actually fetched new data
+    if (shouldSaveTrip) {
+      const updatedDestinations = currentTrip.destinations.map(dest => {
+        if (newAttractions[dest.id]) {
+          return { ...dest, attractions: newAttractions[dest.id] }
+        }
+        return dest
+      })
+      
+      const updatedTrip = { ...currentTrip, destinations: updatedDestinations }
+      saveTrip(updatedTrip)
+    }
   }
 
   const toggleAttractionStatus = (destinationId: string, attractionId: string, status: 'isPlanned' | 'isCompleted') => {
