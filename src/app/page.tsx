@@ -12,6 +12,7 @@ import { Restaurants } from '@/components/pages/Restaurants'
 import { Outfits } from '@/components/pages/Outfits'
 import { Transportation } from '@/components/pages/Transportation'
 import { APITest } from '@/components/debug/APITest'
+import { PlacesDebugger } from '@/components/debug/PlacesDebugger'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
 
 function AppContent() {
@@ -61,6 +62,8 @@ function AppContent() {
         return <Restaurants />
       case 'api-test':
         return <APITest />
+      case 'places-debug':
+        return <PlacesDebugger />
       default:
         return <Dashboard />
     }

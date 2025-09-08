@@ -26,6 +26,7 @@ const Navigation: React.FC = () => {
     { id: 'excursions' as TabType, label: 'Excursions', icon: Calendar },
     { id: 'restaurants' as TabType, label: 'Restaurants', icon: Utensils },
     { id: 'api-test' as TabType, label: 'API Test', icon: Camera },
+    { id: 'places-debug' as TabType, label: 'Places Debug', icon: Camera },
   ]
 
   if (!currentTrip) return null
