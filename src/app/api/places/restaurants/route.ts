@@ -67,17 +67,20 @@ export async function GET(request: NextRequest) {
                 openingHours: 'Hours not available'
               }
 
-              // Get detailed place information
+              // Get detailed place information using POST request
               try {
-                const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}?fields=websiteUri,nationalPhoneNumber,regularOpeningHours&key=${GOOGLE_PLACES_API_KEY}`
+                const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}`
                 console.log('🔍 Server: Fetching details for place:', place.id)
                 console.log('🔍 Server: Details URL:', detailsUrl)
                 
                 const detailsResponse = await fetch(detailsUrl, {
-                  method: 'GET',
+                  method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
+                    'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+                    'X-Goog-FieldMask': 'websiteUri,nationalPhoneNumber,regularOpeningHours'
                   },
+                  body: JSON.stringify({})
                 })
 
                 console.log('📡 Server: Details response status:', detailsResponse.status, detailsResponse.statusText)
@@ -101,7 +104,7 @@ export async function GET(request: NextRequest) {
                 console.log('⚠️ Server: Could not fetch detailed info for place:', place.id, error)
               }
 
-              return {
+              const restaurant = {
                 id: place.id || `restaurant_${Math.random().toString(36).substr(2, 9)}`,
                 name: place.displayName?.text || 'Restaurant',
                 cuisine: getCuisineFromTypes(place.types),
@@ -115,6 +118,14 @@ export async function GET(request: NextRequest) {
                 isBookmarked: false,
                 photoUrl: place.photos?.[0] ? `https://places.googleapis.com/v1/${place.photos[0].name}/media?maxWidthPx=400&key=${GOOGLE_PLACES_API_KEY}` : undefined
               }
+              
+              console.log('🍽️ Server: Final restaurant data for', restaurant.name, ':', {
+                website: restaurant.website,
+                phone: restaurant.phone,
+                openingHours: restaurant.openingHours
+              })
+              
+              return restaurant
             })
           )
 

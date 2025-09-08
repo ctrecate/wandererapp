@@ -180,14 +180,35 @@ const Restaurants: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Restaurants & Dining</h1>
           <p className="text-gray-600">Discover local cuisine and dining recommendations</p>
         </div>
-        <Button 
-          onClick={() => loadRestaurantsForDestinations(true)}
-          variant="outline"
-          className="flex items-center space-x-2"
-        >
-          <span>🔄</span>
-          <span>Force Refresh from Google Places</span>
-        </Button>
+        <div className="flex space-x-2">
+          <Button 
+            onClick={() => loadRestaurantsForDestinations(true)}
+            variant="outline"
+            className="flex items-center space-x-2"
+          >
+            <span>🔄</span>
+            <span>Force Refresh from Google Places</span>
+          </Button>
+          
+          <Button 
+            onClick={async () => {
+              try {
+                const response = await fetch('/api/places/debug')
+                const data = await response.json()
+                console.log('🔍 Debug API Response:', data)
+                alert(`Debug Results:\nWebsite: ${data.details?.website || 'None'}\nPhone: ${data.details?.phone || 'None'}\nHours: ${data.details?.openingHours ? 'Available' : 'None'}\n\nCheck console for full details.`)
+              } catch (error) {
+                console.error('Debug API Error:', error)
+                alert('Debug API failed - check console for details')
+              }
+            }}
+            variant="outline"
+            className="flex items-center space-x-2 bg-yellow-100 text-yellow-800"
+          >
+            <span>🐛</span>
+            <span>Debug API</span>
+          </Button>
+        </div>
       </div>
 
       {/* Filters */}

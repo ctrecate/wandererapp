@@ -66,17 +66,20 @@ export async function GET(request: NextRequest) {
                 openingHours: 'Hours vary'
               }
 
-              // Get detailed place information
+              // Get detailed place information using POST request
               try {
-                const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}?fields=websiteUri,regularOpeningHours&key=${GOOGLE_PLACES_API_KEY}`
+                const detailsUrl = `https://places.googleapis.com/v1/places/${place.id}`
                 console.log('🔍 Server: Fetching attraction details for place:', place.id)
                 console.log('🔍 Server: Attraction details URL:', detailsUrl)
                 
                 const detailsResponse = await fetch(detailsUrl, {
-                  method: 'GET',
+                  method: 'POST',
                   headers: {
                     'Content-Type': 'application/json',
+                    'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+                    'X-Goog-FieldMask': 'websiteUri,regularOpeningHours'
                   },
+                  body: JSON.stringify({})
                 })
 
                 console.log('📡 Server: Attraction details response status:', detailsResponse.status, detailsResponse.statusText)
