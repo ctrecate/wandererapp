@@ -268,7 +268,22 @@ const Restaurants: React.FC = () => {
                   console.log('🧪 TEST: First restaurant phone:', firstRestaurant.phone)
                   console.log('🧪 TEST: First restaurant hours:', firstRestaurant.openingHours)
                   
-                  alert(`Direct API Test Results:\n\nRestaurant: ${firstRestaurant.name}\nWebsite: "${firstRestaurant.website || 'NONE'}"\nPhone: "${firstRestaurant.phone || 'NONE'}"\nHours: "${firstRestaurant.openingHours || 'NONE'}"\n\nCheck console for full data.`)
+                  // Show all restaurants with their details
+                  console.log('🧪 TEST: All restaurants details:')
+                  data.restaurants.forEach((r, i) => {
+                    console.log(`Restaurant ${i + 1}: ${r.name}`, {
+                      website: r.website,
+                      phone: r.phone,
+                      hours: r.openingHours,
+                      hasWebsite: !!r.website,
+                      hasPhone: !!r.phone
+                    })
+                  })
+                  
+                  const restaurantsWithWebsites = data.restaurants.filter(r => r.website)
+                  const restaurantsWithPhones = data.restaurants.filter(r => r.phone)
+                  
+                  alert(`Direct API Test Results:\n\nRestaurant: ${firstRestaurant.name}\nWebsite: "${firstRestaurant.website || 'NONE'}"\nPhone: "${firstRestaurant.phone || 'NONE'}"\nHours: "${firstRestaurant.openingHours || 'NONE'}"\n\nTotal restaurants: ${data.restaurants.length}\nRestaurants with websites: ${restaurantsWithWebsites.length}\nRestaurants with phones: ${restaurantsWithPhones.length}\n\nCheck console for full data.`)
                 } else {
                   alert('Direct API Test: No restaurants returned')
                 }
@@ -282,6 +297,31 @@ const Restaurants: React.FC = () => {
           >
             <span>🧪</span>
             <span>Test API</span>
+          </Button>
+          
+          <Button 
+            onClick={async () => {
+              try {
+                console.log('🔑 TEST: Testing API key permissions')
+                const response = await fetch('/api/places/test-key')
+                const data = await response.json()
+                console.log('🔑 TEST: API key test response:', data)
+                
+                if (data.success) {
+                  alert(`API Key Test Results:\n\n✅ API Key is working!\n\nPlace: ${data.place.name}\nWebsite: "${data.details.website || 'NONE'}"\nPhone: "${data.details.phone || 'NONE'}"\nHours: ${data.details.openingHours ? 'Available' : 'NONE'}\n\nCheck console for full details.`)
+                } else {
+                  alert(`API Key Test Failed:\n\n❌ Error: ${data.error}\nStatus: ${data.status}\nDetails: ${data.details}\n\nCheck console for full error.`)
+                }
+              } catch (error) {
+                console.error('🔑 TEST: API key test error:', error)
+                alert('API Key Test failed - check console')
+              }
+            }}
+            variant="outline"
+            className="flex items-center space-x-2 bg-green-100 text-green-800"
+          >
+            <span>🔑</span>
+            <span>Test API Key</span>
           </Button>
         </div>
       </div>
