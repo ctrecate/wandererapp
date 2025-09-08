@@ -14,6 +14,7 @@ export async function GET(request: NextRequest) {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
+        'X-Goog-FieldMask': 'places.id,places.displayName,places.types,places.rating,places.priceLevel,places.formattedAddress,places.photos'
       },
       body: JSON.stringify({
         textQuery: 'restaurants in Venice, Italy',

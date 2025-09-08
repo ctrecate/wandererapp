@@ -126,7 +126,7 @@ export async function GET(request: NextRequest) {
           headers: {
             'Content-Type': 'application/json',
             'X-Goog-Api-Key': GOOGLE_PLACES_API_KEY,
-            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.types,places.location,places.photos,places.websiteUri,places.editorialSummary',
+            'X-Goog-FieldMask': 'places.id,places.displayName,places.formattedAddress,places.rating,places.userRatingCount,places.priceLevel,places.types,places.location,places.photos,places.websiteUri,places.editorialSummary',
           },
           body: JSON.stringify({
             textQuery: query,
