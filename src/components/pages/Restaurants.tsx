@@ -37,10 +37,9 @@ const Restaurants: React.FC = () => {
         
         console.log(`API returned ${cityRestaurants.length} restaurants for ${destination.city}`)
         
-        // If API returns empty and we're not forcing API, try static data
-        if (cityRestaurants.length === 0 && !forceAPI) {
-          console.log(`No API results, trying static data for ${destination.city}`)
-          cityRestaurants = getRestaurantsForCity(destination.city)
+        // If API returns empty, show empty state
+        if (cityRestaurants.length === 0) {
+          console.log(`No restaurants found for ${destination.city}`)
         }
         
         // Merge with existing restaurants from the destination
@@ -52,14 +51,8 @@ const Restaurants: React.FC = () => {
         newRestaurants[destination.id] = mergedRestaurants
       } catch (error) {
         console.error('Error loading restaurants for', destination.city, error)
-        // Fallback to static data
-        const cityRestaurants = getRestaurantsForCity(destination.city)
-        const existingRestaurants = destination.restaurants || []
-        const mergedRestaurants = cityRestaurants.map(restaurant => {
-          const existing = existingRestaurants.find(existing => existing.id === restaurant.id)
-          return existing ? { ...restaurant, ...existing } : restaurant
-        })
-        newRestaurants[destination.id] = mergedRestaurants
+        // No fallback data - show empty state
+        newRestaurants[destination.id] = []
       }
     }
 
@@ -263,7 +256,8 @@ const Restaurants: React.FC = () => {
                   </h2>
                   <div className="text-center py-8">
                     <Utensils className="mx-auto h-8 w-8 text-gray-400 mb-2" />
-                    <p className="text-gray-500">No restaurants available for this destination</p>
+                    <p className="text-gray-500">No restaurants found for {destination.city}, {destination.country}</p>
+                    <p className="text-sm text-gray-400 mt-1">Try checking the spelling or try a different city</p>
                   </div>
                 </div>
               )
