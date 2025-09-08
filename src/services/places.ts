@@ -24,6 +24,7 @@ export interface GooglePlacesResponse {
   results: GooglePlace[]
   status: string
   next_page_token?: string
+  error_message?: string
 }
 
 // Fetch restaurants from Google Places API
