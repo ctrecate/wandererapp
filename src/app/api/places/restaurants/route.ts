@@ -221,6 +221,13 @@ export async function GET(request: NextRequest) {
             })
           )
 
+          console.log('🍽️ Server: Final restaurants array:', restaurants.map(r => ({
+            name: r.name,
+            website: r.website,
+            phone: r.phone,
+            openingHours: r.openingHours
+          })))
+          
           return NextResponse.json({ restaurants, source: 'google_places_api' })
         } else {
           console.log('⚠️ Server: No results for query:', query, 'Status:', data.status, 'Error:', data.error_message)

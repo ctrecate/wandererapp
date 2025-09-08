@@ -58,6 +58,7 @@ const Restaurants: React.FC = () => {
           phone: r.phone,
           openingHours: r.openingHours
         })))
+        console.log(`🍽️ DEBUG: Full raw API data:`, cityRestaurants)
         
         // If API returns empty, show empty state
         if (cityRestaurants.length === 0) {
@@ -73,6 +74,7 @@ const Restaurants: React.FC = () => {
             phone: merged.phone,
             openingHours: merged.openingHours
           })
+          console.log(`🍽️ DEBUG: Full merged restaurant ${merged.name}:`, merged)
           return merged
         })
         newRestaurants[destination.id] = mergedRestaurants
@@ -229,13 +231,57 @@ const Restaurants: React.FC = () => {
               const restaurantsWithWebsites = allRestaurants.filter(r => r.website)
               const restaurantsWithHours = allRestaurants.filter(r => r.openingHours && r.openingHours !== 'Hours not available')
               
-              alert(`Current Restaurant Data:\n\nTotal restaurants: ${allRestaurants.length}\nRestaurants with websites: ${restaurantsWithWebsites.length}\nRestaurants with hours: ${restaurantsWithHours.length}\n\nCheck console for detailed data.`)
+              // Log detailed data for first few restaurants
+              console.log('🔍 DEBUG: First 3 restaurants detailed data:')
+              allRestaurants.slice(0, 3).forEach((r, i) => {
+                console.log(`Restaurant ${i + 1} (${r.name}):`, {
+                  website: r.website,
+                  phone: r.phone,
+                  openingHours: r.openingHours,
+                  hasWebsite: !!r.website,
+                  websiteType: typeof r.website,
+                  websiteLength: r.website?.length || 0
+                })
+              })
+              
+              alert(`Current Restaurant Data:\n\nTotal restaurants: ${allRestaurants.length}\nRestaurants with websites: ${restaurantsWithWebsites.length}\nRestaurants with hours: ${restaurantsWithHours.length}\n\nFirst restaurant website: "${allRestaurants[0]?.website || 'NONE'}"\nFirst restaurant phone: "${allRestaurants[0]?.phone || 'NONE'}"\nFirst restaurant hours: "${allRestaurants[0]?.openingHours || 'NONE'}"\n\nCheck console for detailed data.`)
             }}
             variant="outline"
             className="flex items-center space-x-2 bg-yellow-100 text-yellow-800"
           >
             <span>🐛</span>
             <span>Debug Data</span>
+          </Button>
+          
+          <Button 
+            onClick={async () => {
+              try {
+                console.log('🧪 TEST: Direct API call to Venice')
+                const response = await fetch('/api/places/restaurants?city=Venice&country=Italy')
+                const data = await response.json()
+                console.log('🧪 TEST: Direct API response:', data)
+                
+                if (data.restaurants && data.restaurants.length > 0) {
+                  const firstRestaurant = data.restaurants[0]
+                  console.log('🧪 TEST: First restaurant from API:', firstRestaurant)
+                  console.log('🧪 TEST: First restaurant website:', firstRestaurant.website)
+                  console.log('🧪 TEST: First restaurant phone:', firstRestaurant.phone)
+                  console.log('🧪 TEST: First restaurant hours:', firstRestaurant.openingHours)
+                  
+                  alert(`Direct API Test Results:\n\nRestaurant: ${firstRestaurant.name}\nWebsite: "${firstRestaurant.website || 'NONE'}"\nPhone: "${firstRestaurant.phone || 'NONE'}"\nHours: "${firstRestaurant.openingHours || 'NONE'}"\n\nCheck console for full data.`)
+                } else {
+                  alert('Direct API Test: No restaurants returned')
+                }
+              } catch (error) {
+                console.error('🧪 TEST: Direct API error:', error)
+                alert('Direct API Test failed - check console')
+              }
+            }}
+            variant="outline"
+            className="flex items-center space-x-2 bg-blue-100 text-blue-800"
+          >
+            <span>🧪</span>
+            <span>Test API</span>
           </Button>
         </div>
       </div>
